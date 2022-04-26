@@ -21,6 +21,7 @@ const router = new VueRouter({
     { path: '/basic/log', component: LogConfig, meta: { index: 1, title: '日志设置' } },
     { path: '/advance/skipPackage', component: SkipPackageConfig, meta: { index: 1, title: '前台应用白名单设置' } },
     { path: '/advance/common', component: AdvanceCommonConfig, meta: { index: 1, title: '高级设置' } },
+    { path: '/about', component: About, meta: { index: 1, title: '关于项目' } },
     { path: '/QA', component: QuestionAnswer, meta: { index: 1, title: '常见问题' } },
     { path: '/view/collectSummary', component: CollectSummary, meta: { index: 1, title: '浇水统计', keepAlive: true } },
   ]

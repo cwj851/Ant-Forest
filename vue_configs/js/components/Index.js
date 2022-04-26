@@ -48,6 +48,10 @@ let Index = {
           link: '/advance/common'
         },
         {
+          title: '关于项目',
+          link: '/about'
+        },
+        {
           title: '常见问题',
           link: '/QA'
         },
