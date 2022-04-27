@@ -6,7 +6,8 @@ var { default_config, config, storage_name: _storage_name } = require('../config
 let _commonFunctions = singletonRequire('CommonFunction')
 let fileUtils = singletonRequire('FileUtils')
 let runningQueueDispatcher = singletonRequire('RunningQueueDispatcher')
-let callStateListener = !config.is_pro && config.enable_call_state_control ? singletonRequire('CallStateListener') : { exitIfNotIdle: () => { } }
+//let callStateListener = !config.is_pro && config.enable_call_state_control ? singletonRequire('CallStateListener') : { exitIfNotIdle: () => { } }
+let resourceMonitor = require('../lib/ResourceMonitor.js')(runtime, global)
 
 /**
  * 主线程
@@ -43,7 +44,7 @@ console.log('======加入任务队列成功=======')
 events.on('exit', function () {
     config.isRunning = false
   })
-  callStateListener.exitIfNotIdle()
+  //callStateListener.exitIfNotIdle()
   // 注册自动移除运行中任务
   _commonFunctions.registerOnEngineRemoved(function () {
     config.resetBrightness && config.resetBrightness()
@@ -103,7 +104,7 @@ function interruptStopListenThread() {
   /**
    * 监听音量上键直接关闭 音量下延迟5分钟
    */
-  function listenStopCollect() {
+function listenStopCollect() {
     interruptStopListenThread()
     stopListenThread = threads.start(function () {
       toast('即将开始运行，运行中可按音量上键关闭', true)
@@ -231,14 +232,6 @@ function main() {
             //return
         }
     }
-/*     if (config.collect_self || config.is_watering_friend) {
-    } else {
-        _conThread = threads.start(function () {
-            Dream.ConSole()
-        })
-    } */
-
-
     _golThread = threads.start(function () {
         //console.show();
         start_app()
@@ -348,12 +341,8 @@ function main() {
                         console.error("线程结束！共操作账号个数：" + (i + 1));
                         floaty_show_text("线程结束！共操作账号个数：" + (i + 1))
                         console.log("====================");
-/*                         if (config.collect_self || config.is_watering_friend) {
-                        } else {
-                            Dream.close()
-                        } */
                         before_exit_hander()
-                        setTimeout(() => { exit() }, 1000 * 5);
+                        try{setTimeout(() => { exit() }, 1000 * 5);}catch(e){}
                     } else {
                         if (config.auto_delay) {
                             let counti = 1
@@ -376,14 +365,21 @@ function main() {
                             console.info("延迟等待" + config.accoun_change_time + "秒后操作下一个账号...");
                             floaty_show_text("延迟等待" + config.accoun_change_time + "秒后操作下一个账号...")
                             console.log("====================");
-                            toast("森林助手[防息屏]")
-                            delay(config.accoun_change_time)
+                            //toast("森林助手[防息屏]")
+                            //delay(config.accoun_change_time)
+                            let counti = 1
+                            while (counti++ < config.accoun_change_time) {
+                                if (counti % 25 == 0) {
+                                    toast("森林助手[防息屏]")
+                                }
+                                sleep(1000)
+                            }
+                            counti = 1
                         }
                         account_manager()
                     }
                 }
             }
-
         } else {
             console.error('读取账号列表失败，停止运行！');
             before_exit_hander()
@@ -393,6 +389,10 @@ function main() {
 }
 
 function before_exit_hander(){
+    //callStateListener.disableListener()
+    if(resourceMonitor!=null){resourceMonitor.releaseAll()}
+    interruptStopListenThread()
+    events.removeAllListeners('key_down')
     if (config.auto_lock) { automator.lockScreen() }
     runningQueueDispatcher.removeRunningTask()
     if (scanner !== null) {

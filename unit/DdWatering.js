@@ -8,7 +8,7 @@ var { default_config, config, storage_name: _storage_name } = require('../config
 let _commonFunctions = singletonRequire('CommonFunction')
 let fileUtils = singletonRequire('FileUtils')
 let runningQueueDispatcher = singletonRequire('RunningQueueDispatcher')
-let callStateListener = !config.is_pro && config.enable_call_state_control ? singletonRequire('CallStateListener') : { exitIfNotIdle: () => { } }
+//let callStateListener = !config.is_pro && config.enable_call_state_control ? singletonRequire('CallStateListener') : { exitIfNotIdle: () => { } }
 
 //let Dream = require('./ConSole.js')
 let group_lists = [];
@@ -38,7 +38,7 @@ console.log('======加入任务队列成功=======')
 events.on('exit', function () {
     config.isRunning = false
   })
-  callStateListener.exitIfNotIdle()
+  //callStateListener.exitIfNotIdle()
   // 注册自动移除运行中任务
   _commonFunctions.registerOnEngineRemoved(function () {
     config.resetBrightness && config.resetBrightness()
@@ -114,12 +114,10 @@ function floaty_show_text(text) {
 }
 
 function before_exit_hander(){
+    interruptStopListenThread()
+    events.removeAllListeners('key_down')
     if (config.auto_lock) { automator.lockScreen() }
     runningQueueDispatcher.removeRunningTask()
-    if (scanner !== null) {
-        scanner.destroy()
-        scanner = null
-      }
       _commonFunctions.reduceConsoleLogs()
 }
 
@@ -264,7 +262,7 @@ function main() {
         sleep(2000)
         home()
         before_exit_hander()
-        setTimeout(() => { exit() }, 1000 * 5)
+        try{setTimeout(() => { exit() }, 1000 * 5);}catch(e){}
     })
 }
 
