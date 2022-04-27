@@ -337,28 +337,24 @@ const ChangeConfig = {
   mixins: [mixin_common],
   data() {
     return {
-      showAddWhiteDialog: false,
-      newWhite: '',
+      showAddGroupDialog: false,
+      newGroup: '',
       configs: {
         DdGroups_list: ['1', '2', '3'],
       }
     }
   },
   methods: {
-    saveConfigs: function () {
-      this.doSaveConfigs()
-      $app.invoke('updateProtectList', { protectList: this.protectList })
+    addGroup: function () {
+      this.newGroup = ''
+      this.showAddGroupDialog = true
     },
-    addWhite: function () {
-      this.newWhite = ''
-      this.showAddWhiteDialog = true
-    },
-    doAddWhite: function () {
-      if (this.isNotEmpty(this.newWhite) && this.configs.DdGroups_list.indexOf(this.newWhite) < 0) {
-        this.configs.DdGroups_list.push(this.newWhite)
+    doAddGroup: function () {
+      if (this.isNotEmpty(this.newGroup) && this.configs.DdGroups_list.indexOf(this.newGroup) < 0) {
+        this.configs.DdGroups_list.push(this.newGroup)
       }
     },
-    deleteWhite: function (idx) {
+    deleteGroup: function (idx) {
       this.$dialog.confirm({
         message: '确认要删除' + this.configs.DdGroups_list[idx] + '吗？'
       }).then(() => {
@@ -370,21 +366,21 @@ const ChangeConfig = {
   <div>
     <van-divider content-position="left">
       小号换绑浇水列表设置
-      <van-button style="margin-left: 0.4rem" plain hairline type="primary" size="mini" @click="addWhite">增加</van-button>
+      <van-button style="margin-left: 0.4rem" plain hairline type="primary" size="mini" @click="addGroup">增加</van-button>
     </van-divider>
     <tip-block>配置进行操作的群组名称</tip-block>
     <van-cell-group>
       <div style="overflow:scroll;padding:1rem;background:#f1f1f1;">
-      <van-swipe-cell v-for="(white,idx) in configs.DdGroups_list" :key="white" stop-propagation>
-        <van-cell :title="white" />
+      <van-swipe-cell v-for="(Group,idx) in configs.DdGroups_list" :key="Group" stop-propagation>
+        <van-cell :title="Group" />
         <template #right>
-          <van-button square type="danger" text="删除" @click="deleteWhite(idx)" />
+          <van-button square type="danger" text="删除" @click="deleteGroup(idx)" />
         </template>
       </van-swipe-cell>
       </div>
     </van-cell-group>
-    <van-dialog v-model="showAddWhiteDialog" title="增加群组" show-cancel-button @confirm="doAddWhite" :get-container="getContainer">
-      <van-field v-model="newWhite" placeholder="请输入群组名称" label="群组名称" />
+    <van-dialog v-model="showAddGroupDialog" title="增加群组" show-cancel-button @confirm="doAddGroup" :get-container="getContainer">
+      <van-field v-model="newGroup" placeholder="请输入群组名称" label="群组名称" />
     </van-dialog>
   </div>
   `
@@ -397,28 +393,24 @@ const ChangeConfig = {
   mixins: [mixin_common],
   data() {
     return {
-      showAddWhiteDialog: false,
-      newWhite: '',
+      showAddGroup_ExDialog: false,
+      newGroup_Ex: '',
       configs: {
         DdGroups_list_Ex: ['1', '2', '3'],
       }
     }
   },
   methods: {
-    saveConfigs: function () {
-      this.doSaveConfigs()
-      $app.invoke('updateProtectList', { protectList: this.protectList })
+    addGroup_Ex: function () {
+      this.newGroup_Ex = ''
+      this.showAddGroup_ExDialog = true
     },
-    addWhite: function () {
-      this.newWhite = ''
-      this.showAddWhiteDialog = true
-    },
-    doAddWhite: function () {
-      if (this.isNotEmpty(this.newWhite) && this.configs.DdGroups_list_Ex.indexOf(this.newWhite) < 0) {
-        this.configs.DdGroups_list_Ex.push(this.newWhite)
+    doAddGroup_Ex: function () {
+      if (this.isNotEmpty(this.newGroup_Ex) && this.configs.DdGroups_list_Ex.indexOf(this.newGroup_Ex) < 0) {
+        this.configs.DdGroups_list_Ex.push(this.newGroup_Ex)
       }
     },
-    deleteWhite: function (idx) {
+    deleteGroup_Ex: function (idx) {
       this.$dialog.confirm({
         message: '确认要删除' + this.configs.DdGroups_list_Ex[idx] + '吗？'
       }).then(() => {
@@ -430,21 +422,21 @@ const ChangeConfig = {
   <div>
     <van-divider content-position="left">
     大号浇水群组列表设置
-      <van-button style="margin-left: 0.4rem" plain hairline type="primary" size="mini" @click="addWhite">增加</van-button>
+      <van-button style="margin-left: 0.4rem" plain hairline type="primary" size="mini" @click="addGroup_Ex">增加</van-button>
     </van-divider>
     <tip-block>配置进行操作的群组名称</tip-block>
     <van-cell-group>
       <div style="overflow:scroll;padding:1rem;background:#f1f1f1;">
-      <van-swipe-cell v-for="(white,idx) in configs.DdGroups_list_Ex" :key="white" stop-propagation>
-        <van-cell :title="white" />
+      <van-swipe-cell v-for="(Group_Ex,idx) in configs.DdGroups_list_Ex" :key="Group_Ex" stop-propagation>
+        <van-cell :title="Group_Ex" />
         <template #right>
-          <van-button square type="danger" text="删除" @click="deleteWhite(idx)" />
+          <van-button square type="danger" text="删除" @click="deleteGroup_Ex(idx)" />
         </template>
       </van-swipe-cell>
       </div>
     </van-cell-group>
-    <van-dialog v-model="showAddWhiteDialog" title="增加群组" show-cancel-button @confirm="doAddWhite" :get-container="getContainer">
-      <van-field v-model="newWhite" placeholder="请输入群组名称" label="群组名称" />
+    <van-dialog v-model="showAddGroup_ExDialog" title="增加群组" show-cancel-button @confirm="doAddGroup_Ex" :get-container="getContainer">
+      <van-field v-model="newGroup_Ex" placeholder="请输入群组名称" label="群组名称" />
     </van-dialog>
   </div>
   `
