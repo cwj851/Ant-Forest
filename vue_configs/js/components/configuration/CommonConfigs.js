@@ -747,3 +747,78 @@ const SkipPackageConfig = {
     </van-dialog>
   </div>`
 }
+
+
+/**
+ * 小米运动账号
+ */
+ const ModificationStepConfig = {
+  mixins: [mixin_common],
+  data() {
+    return {
+      newHMuser: '',
+      newHMpassword: '',
+      showAddHMaccountDialog: false,
+      configs: {
+        step_min: 18000,
+        step_max: 21000,
+        huami_account_lists: [{ username: 'com.tony.test', password: 'test' }, { username: 'com.tony.test2', password: 'test2' }],
+      }
+    }
+  },
+  methods: {
+    addHMaccount: function () {
+      this.newHMuser = ''
+      this.newHMpassword = ''
+      this.showAddHMaccountDialog = true
+    },
+    doaddHMaccount: function () {
+      if (!this.isNotEmpty(this.newHMuser)) {
+        vant.Toast('请输入小米运动账号')
+        return
+      }
+      if (!this.isNotEmpty(this.newHMpassword)) {
+        vant.Toast('请输入小米运动密码')
+        return
+      }
+      if (this.configs.huami_account_lists.indexOf(this.newHMuser) < 0) {
+        this.configs.huami_account_lists.push({ username: this.newHMuser, password: this.newHMpassword })
+      }
+    },
+    deleteHMaccount: function (idx) {
+      this.$dialog.confirm({
+        message: '确认要删除' + this.configs.huami_account_lists[idx].username + '吗？'
+      }).then(() => {
+        this.configs.huami_account_lists.splice(idx, 1)
+      }).catch(() => { })
+    },
+    handlePackageChange: function (payload) {
+      this.newHMuser = payload.username
+      this.newHMpassword = payload.password
+    },
+  },
+  template: `
+  <div>
+    <van-divider content-position="left">
+      小米运动同步步数账号设置
+      <van-button style="margin-left: 0.4rem" plain hairline type="primary" size="mini" @click="addHMaccount">增加</van-button>
+    </van-divider>
+    <van-cell-group>
+    <number-field v-model="configs.step_min" label="改步最小值" placeholder="请输入改步最小值" />
+    <number-field v-model="configs.step_max" label="改步最大值" placeholder="请输入改步最大值" />
+    <tip-block>配置进行步数同步的小米运动账号</tip-block>
+      <div style="min-height:10rem;overflow:scroll;padding:1rem;background:#f1f1f1;">
+        <van-swipe-cell v-for="(HM,idx) in configs.huami_account_lists" :key="HM.username" stop-propagation>
+          <van-cell :title="HM.username" :label="HM.password" />
+          <template #right>
+            <van-button square type="danger" text="删除" @click="deleteHMaccount(idx)" style="height: 100%"/>
+          </template>
+        </van-swipe-cell>
+      </div>
+    </van-cell-group>
+    <van-dialog v-model="showAddHMaccountDialog" title="增加小米运动账号" show-cancel-button @confirm="doaddHMaccount" :get-container="getContainer">
+      <van-field v-model="newHMuser" placeholder="请输入小米运动账号" label="账号" />
+      <van-field v-model="newHMpassword" placeholder="请输入小米运动密码" label="密码" />
+    </van-dialog>
+  </div>`
+}

@@ -12,6 +12,10 @@ let Index = {
           link: '/basic/change'
         },
         {
+          title: '步数修改',
+          link: '/advance/ModificationStep'
+        },
+        {
           title: '能量雨设置',
           link: '/basic/rain'
         },

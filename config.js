@@ -47,6 +47,10 @@ let default_config = {
   Master_Account: '',
   change_water_Num: 1000,
   intent_or_click:'b',
+  //步数修改设置
+  step_min: 18000,
+  step_max: 21000,
+  huami_account_lists: [],
   //Study设置参数
   choose: 'c',                 //文字识别(OCR)类型选择  华为OCR接口,需要填入以下关于华为的内容|第三方OCR插件,需要安装第三方插件|内置Paddle OCR->推荐|百度OCR接口,需要填入以下关于百度的内容
   meizhou_txt: true,           //每周答题(建议手动答题)

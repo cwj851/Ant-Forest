@@ -13,6 +13,7 @@ const router = new VueRouter({
     { path: '/basic/lock', component: LockConfig, meta: { index: 1, title: '锁屏设置' } },
     { path: '/basic/floaty', component: FloatyConfig, meta: { index: 1, title: '悬浮窗设置' } },
     { path: '/basic/change', component: ChangeConfig, meta: { index: 1, title: '切号设置' } },
+    { path: '/advance/ModificationStep', component: ModificationStepConfig, meta: { index: 1, title: '步数修改' } },
     { path: '/advance/region', component: RegionConfig, meta: { index: 1, title: '图像识别相关设置' } },
     { path: '/basic/Ddwater', component: DdwaterConfig, meta: { index: 1, title: '钉钉设置' } },
     { path: '/basic/Ddwater/Groups', component: GroupsConfig, meta: { index: 2, title: '小号换绑浇水列表设置' } },

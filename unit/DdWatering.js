@@ -545,13 +545,13 @@ function watering_Ex(group_name, waterNum) {
                     logUtils.warnInfo('正在进入公益树...');
                     floaty_show_text("正在进入公益树...")
                 }
-            } else {
+            } /* else {
                 if (className("android.widget.ImageView").desc("群聊信息").exists()) {
                     logUtils.errorInfo('群名：' + group_name + '没有公益树');
                     floaty_show_text('群名：' + group_name + '没有公益树')
                     complete = true
                 }
-            }
+            } */
         }
         if (text('总排行榜').exists()) {
             cooperate_energy = get_cooperate_energy()

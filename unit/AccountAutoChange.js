@@ -469,7 +469,7 @@ function SearchAndClick(account_name) {
         click(result.bounds().centerX(), result.bounds().centerY());
     }
 }
-
+ 
 /* function SearchAndClickNew(account_name) {
     var result = text(account_name).findOne().parent().parent()
     if (result) {
