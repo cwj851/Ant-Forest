@@ -13,7 +13,7 @@ var text = file.read();
 //转换成json对象
 var config_json=eval('(' + text+ ')');
 //检测时间
-config_json.checkInterval=3600000;
+config_json.checkInterval=2400000;
 //线程数
 config_json.threadCount=1;
 config_json.queryThreadCount=1;

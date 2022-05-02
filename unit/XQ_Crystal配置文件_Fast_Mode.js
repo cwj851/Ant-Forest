@@ -15,7 +15,7 @@ var config_json=eval('(' + text+ ')');
 //检测时间
 config_json.checkInterval=50000;
 //线程数
-config_json.threadCount=8;
+config_json.threadCount=4;
 config_json.queryThreadCount=1;
 //写入文件
 files.write(path, JSON.stringify(config_json))

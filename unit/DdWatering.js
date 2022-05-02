@@ -288,7 +288,10 @@ function watering_by_grouplists_EX() {
 }
 
 function watering_by_grouplists() {
+/*     let Group_list=config.DdGroups_list
+    let Group_list_length=Group_list.length */
     for (var j = 0; j < config.DdGroups_list.length; j++) {
+        //logUtils.debugInfo(['当前浇水群序号：{}' ,j])
         if (search_groupsAndclick(config.DdGroups_list[j])) {
             watered_group.push(config.DdGroups_list[j])
             logUtils.infoLog('群名：' + config.DdGroups_list[j]);
@@ -304,7 +307,7 @@ function watering_by_grouplists() {
                         }
                     }
                     watering(config.DdGroups_list[j], wateringNum)
-                    if (j == config.DdGroups_list.length - 1) {
+                    if (j == (config.DdGroups_list.length - 1)) {
                         if (is_Master_Account) {
                             logUtils.warnInfo("小号浇水完毕已经是大号无需再换绑");
                             floaty_show_text("小号浇水完毕已经是大号无需再换绑")
@@ -321,7 +324,7 @@ function watering_by_grouplists() {
                         }
                     }
                 } else {
-                    watering_Ex(config.DdGroups_list[j], wateringNum)
+                    watering_Ex(Group_list[j], wateringNum)
                 }
             }
             if (config.No_interruptions) { open_No_interruptions() }
@@ -371,7 +374,6 @@ function watering_by_keywords() {
         sleep(500)
     }
 }
-
 
 function group_lists_manager() {
     while (!idContains("tv_title").className("android.widget.TextView").text("我的群组").exists()) {
@@ -632,13 +634,13 @@ function watering(group_name, waterNum) {
                     logUtils.warnInfo('正在进入公益树...');
                     floaty_show_text("正在进入公益树...")
                 }
-            } else {
+            } /* else {
                 if (className("android.widget.ImageView").desc("群聊信息").exists()) {
                     logUtils.errorInfo('群名：' + group_name + '没有公益树');
                     floaty_show_text('群名：' + group_name + '没有公益树')
                     complete = true
                 }
-            }
+            } */
         }
         if (text('总排行榜').exists()) {
             cooperate_energy = get_cooperate_energy()
@@ -755,13 +757,13 @@ function continue_watering(group_name, waterNum) {
                     logUtils.warnInfo('正在进入公益树...');
                     floaty_show_text("正在进入公益树...")
                 }
-            } else {
+            }/*  else {
                 if (className("android.widget.ImageView").desc("群聊信息").exists()) {
                     logUtils.errorInfo('群名：' + group_name + '没有公益树');
                     floaty_show_text('群名：' + group_name + '没有公益树')
                     complete = true
                 }
-            }
+            } */
         }
         if (text('总排行榜').exists()) {
             cooperate_energy = get_cooperate_energy()
@@ -936,34 +938,42 @@ function open_sticky() {
 }
 
 function search_groupsAndclick(group_name) {
-    while (!idContains("search_src_text").exists() && text("我加入的").exists()) {
-        if (idContains("view_search").exists()) {
-            try { idContains("view_search").findOnce().click() } catch (e) { }
+    let complete=false
+    while (!complete) {
+        if (textContains(group_name).exists()) {
+            if (text("未搜索到相关结果").exists() ) {
+                logUtils.logInfo(group_name+'未搜索到相关结果')
+                complete = true
+            }else if(text("我的群组").exists()){
+                sleep(200)
+                try {
+                    //var groupText = idContains("tv_friend_name").findOne(1000)
+                    var groupText = idContains("tv_friend_name").textContains(group_name).findOne(1000)
+                    if (groupText) {
+                        if (groupText.text().indexOf(group_name) != -1) {
+                            logUtils.logInfo("匹配到群：" + group_name)
+                            groupText.parent().parent().parent().parent().parent().parent().click()
+                            return true
+                        }
+                    }
+                } catch (e) { }
+            }
+        } else {
+                var search_groups = idContains("search_src_text").findOnce()
+                if (search_groups) {
+                    logUtils.debugInfo("开始查找群：" + group_name)
+                    search_groups.setText(group_name)
+                }
+                if (idContains("view_search").exists()) {
+                    try { idContains("view_search").findOnce().click() } catch (e) { }
+                }          
+        }
+        if(!idContains("search_src_text").exists() && text("我加入的").exists()){
+            if (idContains("view_search").exists()) {
+                try { idContains("view_search").findOnce().click() } catch (e) { }
+            }
         }
         sleep(500)
-    }
-    while ((!text("未搜索到相关结果").exists() || !textContains(group_name).exists()) && (!text("我的群组").exists() || !textContains(group_name).exists())) {
-        var search_groups = idContains("search_src_text").findOnce()
-        if (search_groups) {
-            search_groups.setText(group_name)
-        }
-        if (idContains("view_search").exists()) {
-            try { idContains("view_search").findOnce().click() } catch (e) { }
-        }
-        sleep(1000)
-    }
-    if (text("未搜索到相关结果").exists()) {
-        return false
-    } else if (text("我的群组").exists()) {
-        try {
-            var groupText = idContains("tv_friend_name").findOne(1000)
-            if (groupText) {
-                if (groupText.text().indexOf(group_name) != -1) {
-                    groupText.parent().parent().parent().parent().parent().parent().click()
-                    return true
-                }
-            }
-        } catch (e) { }
     }
     return false
 }
@@ -1333,7 +1343,7 @@ function DingTalk_Change_bandage(is_back_master) {
 }
 
 function killApp(name) {
-    let forcedStopStr = ["停", "强", "结束"];
+    let forcedStopStr = ["停止", "强行", "结束"];
     let packageName = app.getPackageName(name);
     if (packageName) {
         app.openAppSetting(packageName);
@@ -1343,7 +1353,7 @@ function killApp(name) {
                 let forcedStop = textContains(forcedStopStr[i]).findOne();
                 if (forcedStop.enabled()) {
                     forcedStop.click();
-                    text("确定").findOne().click();
+                    textMatches("确定|.*停止").findOne().click();
                     toastLog(name + "已结束运行");
                     sleep(800);
                     back();

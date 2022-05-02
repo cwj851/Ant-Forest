@@ -1,10 +1,10 @@
 {
-    "name": "自动化v1.0.8",
+    "name": "自动化v1.0.9",
     "main": "main.js",
     "ignore": [
         "build"
     ],
-    "versionName": "1.0.8",
+    "versionName": "1.0.9",
     "packageName": "com.Script.auto.assistant",
     "versionCode": 1
 }

@@ -556,7 +556,8 @@ function SendTool(friendId) {
     //idContains('J_userEnergy').waitFor()
     //desc("关闭").waitFor()
     sleep(2000)
-    while (!text("我的").exists()) {
+    let compelte=false
+    while (!compelte) {
         if (textMatches('(.*)的蚂蚁森林').exists() && textMatches('TA收取你|你收取TA').exists()) {
             console.info("进入好友森林页面成功！");
             floaty_show_text("进入好友森林页面成功！")
@@ -579,12 +580,15 @@ function SendTool(friendId) {
             }
             console.log("没有可送的道具了，返回...")
             //idContains("h5_nav_back").desc("返回").findOnce().child(0).click()
+            compelte=true
             closePage()
         } else if (text('查看更多好友').exists()) {
             console.verbose("自己森林页面，返回！");
+            compelte=true
             closePage()
         } else if (text('加为好友').exists() || text('返回我的森林').exists()) {
             console.verbose("未添加好友，返回！");
+            compelte=true
             closePage()
         }
         openPage()
@@ -603,7 +607,8 @@ function wateringFriend(friendId) {
     //idContains('J_userEnergy').waitFor()
     //desc("关闭").waitFor()
     sleep(2000)
-    while (!text("我的").exists()) {
+    let compelte=false
+    while (!compelte) {
         if (textMatches('(.*)的蚂蚁森林').exists() && textMatches('TA收取你|你收取TA').exists()) {
             console.info("进入好友森林页面成功！");
             floaty_show_text("进入好友森林页面成功！")
@@ -612,12 +617,16 @@ function wateringFriend(friendId) {
                 _widgetUtils.wateringFriends()
                 sleep(1500)
             }
+            compelte=true
             closePage()
+            
         } else if (text('查看更多好友').exists()) {
             console.verbose("自己森林页面，返回！");
+            compelte=true
             closePage()
         } else if (text('加为好友').exists() || text('返回我的森林').exists()) {
             console.verbose("未添加好友，返回！");
+            compelte=true
             closePage()
         }
         openPage()
@@ -667,15 +676,20 @@ function is_Energy_rain_complete() {
 
 function checkAndClickReward() {
     // 直接通过偏移量获取送奖励按钮
-    let jTreeWarp = idContains('J_tree_dialog_wrap').findOne(1000)
     let target = null
-    if (jTreeWarp) {
-        let warpBounds = jTreeWarp.bounds()
-        target = {
-            centerX: parseInt(warpBounds.left - 0.3 * warpBounds.width()),
-            centerY: parseInt(warpBounds.bottom - 0.07 * warpBounds.height())
+    if(idContains("J_pop_treedialog_close").exists()){
+        try{idContains("J_pop_treedialog_close").click()}catch(e){}
+    }else{
+        let jTreeWarp = idContains('J_tree_dialog_wrap').findOne(1000)
+        if (jTreeWarp) {
+            let warpBounds = jTreeWarp.bounds()
+            target = {
+                centerX: parseInt(warpBounds.left - 0.3 * warpBounds.width()),
+                centerY: parseInt(warpBounds.bottom - 0.07 * warpBounds.height())
+            }
         }
     }
+
     return target
 }
 
