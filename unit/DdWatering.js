@@ -8,6 +8,7 @@ var { default_config, config, storage_name: _storage_name } = require('../config
 let _commonFunctions = singletonRequire('CommonFunction')
 let fileUtils = singletonRequire('FileUtils')
 let runningQueueDispatcher = singletonRequire('RunningQueueDispatcher')
+let args = engines.myEngine().execArgv
 //let callStateListener = !config.is_pro && config.enable_call_state_control ? singletonRequire('CallStateListener') : { exitIfNotIdle: () => { } }
 
 //let Dream = require('./ConSole.js')
@@ -116,7 +117,10 @@ function floaty_show_text(text) {
 function before_exit_hander(){
     interruptStopListenThread()
     events.removeAllListeners('key_down')
-    if (config.auto_lock) { automator.lockScreen() }
+    if ((config.auto_lock && args.needRelock)==true) {
+        log('重新锁定屏幕')
+        automator.lockScreen()
+      }
     runningQueueDispatcher.removeRunningTask()
       _commonFunctions.reduceConsoleLogs()
 }
@@ -267,6 +271,12 @@ function main() {
 }
 
 function watering_by_grouplists_EX() {
+    config.DdGroups_list_Ex = []
+    for (var k = 0; k < config.DdWateringGroupsEx.length; k++) {
+        if (InDate(config.DdWateringGroupsEx[k].WateringDate)) {
+            config.DdGroups_list_Ex.push(config.DdWateringGroupsEx[k].GroupName)
+        }
+    }
     for (var j = 0; j < config.DdGroups_list_Ex.length; j++) {
         if (search_groupsAndclick(config.DdGroups_list_Ex[j])) {
             watered_group.push(config.DdGroups_list_Ex[j])
@@ -284,12 +294,19 @@ function watering_by_grouplists_EX() {
                 mine_group()
             }
         }
+
     }
 }
 
 function watering_by_grouplists() {
 /*     let Group_list=config.DdGroups_list
     let Group_list_length=Group_list.length */
+    config.DdGroups_list = []
+    for (var k = 0; k < config.DdWateringGroups.length; k++) {
+        if (InDate(config.DdWateringGroups[k].WateringDate)) {
+            config.DdGroups_list.push(config.DdWateringGroups[k].GroupName)
+        }
+    }
     for (var j = 0; j < config.DdGroups_list.length; j++) {
         //logUtils.debugInfo(['当前浇水群序号：{}' ,j])
         if (search_groupsAndclick(config.DdGroups_list[j])) {
@@ -336,6 +353,16 @@ function watering_by_grouplists() {
                 mine_group()
             }
         }
+    }
+}
+
+function InDate(Datestr) {
+    var oDate1 = new Date();
+    var oDate2 = new Date(Datestr);
+    if(oDate1.getTime() > (oDate2.getTime()-8*60*60*1000)){
+        return false
+    } else {
+        return true
     }
 }
 

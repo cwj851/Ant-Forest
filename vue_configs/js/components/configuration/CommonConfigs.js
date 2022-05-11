@@ -239,7 +239,7 @@ const ChangeConfig = {
   data() {
     return {
       configs: {
-        water_pattern:'1',
+        water_pattern:'2',
         water_keywords: '',                
         skip_keywords: '', 
         is_watering:true,
@@ -333,32 +333,82 @@ const ChangeConfig = {
 /**
  * 小号换绑浇水群组列表设置
  */
- const GroupsConfig = {
+const GroupsConfig = {
   mixins: [mixin_common],
   data() {
     return {
       showAddGroupDialog: false,
+      isEdit: false,
       newGroup: '',
+      newWateringDate: '',
+      editIdx: '',
       configs: {
-        DdGroups_list: ['1', '2', '3'],
+        DdWateringGroups: [{ GroupName: 'a', WateringDate: '2022-06-10' }],
       }
     }
   },
   methods: {
     addGroup: function () {
       this.newGroup = ''
+      this.newWateringDate = ''
+      this.showAddGroupDialog = true
+      this.isEdit = false
+    },
+    editGroup: function (idx) {
+      let target = this.configs.DdWateringGroups[idx]
+      this.editIdx = idx
+      this.isEdit = true
+      this.newGroup = target.GroupName
+      this.newWateringDate = target.WateringDate
       this.showAddGroupDialog = true
     },
+    confirmAction: function () {
+      if (this.isEdit) {
+        this.doEditGroup()
+      } else {
+        this.doAddGroup()
+      }
+    },
     doAddGroup: function () {
-      if (this.isNotEmpty(this.newGroup) && this.configs.DdGroups_list.indexOf(this.newGroup) < 0) {
-        this.configs.DdGroups_list.push(this.newGroup)
+      if (this.isNotEmpty(this.newGroup) && this.configs.DdWateringGroups.map(v => v.GroupName).indexOf(this.newGroup) < 0) {
+        if (this.isNotEmpty(this.newWateringDate)) {
+          let DateRes = this.newWateringDate.match(new RegExp(/((^((1[8-9]\d{2})|([2-9]\d{3}))(-)(10|12|0[13578])(-)(3[01]|[12][0-9]|0[1-9])$)|(^((1[8-9]\d{2})|([2-9]\d{3}))(-)(11|0?[469])(-)(30|[12][0-9]|0[1-9])$)|(^((1[8-9]\d{2})|([2-9]\d{3}))(-)(02)(-)(2[0-8]|1[0-9]|0[1-9])$)|(^([2468][048]00)(-)(02)(-)(29)$)|(^([3579][26]00)(-)(02)(-)(29)$)|(^([1][89][0][48])(-)(02)(-)(29)$)|(^([2-9][0-9][0][48])(-)(02)(-)(29)$)|(^([1][89][2468][048])(-)(02)(-)(29)$)|(^([2-9][0-9][2468][048])(-)(02)(-)(29)$)|(^([1][89][13579][26])(-)(02)(-)(29)$)|(^([2-9][0-9][13579][26])(-)(02)(-)(29)$))/));
+          let DateResult = DateRes ? DateRes[0] : '';
+          if (DateResult != '') {
+            this.configs.DdWateringGroups.push({ GroupName: this.newGroup, WateringDate: DateResult })
+          } else {
+            vant.Toast('浇水截止日期格式不正确')
+          }
+        } else {
+          this.configs.DdWateringGroups.push({ GroupName: this.newGroup, WateringDate: '2122-01-01' })
+        }
+      }
+    },
+    doEditGroup: function () {
+      if (this.isNotEmpty(this.newGroup)) {
+        let newGroup = this.newGroup
+        let editIdx = this.editIdx
+        if (this.configs.DdWateringGroups.filter((v, idx) => v.GroupName == newGroup && idx != editIdx).length > 0) {
+          return
+        }
+        if (this.isNotEmpty(this.newWateringDate)) {
+          let DateRes = this.newWateringDate.match(new RegExp(/((^((1[8-9]\d{2})|([2-9]\d{3}))(-)(10|12|0[13578])(-)(3[01]|[12][0-9]|0[1-9])$)|(^((1[8-9]\d{2})|([2-9]\d{3}))(-)(11|0?[469])(-)(30|[12][0-9]|0[1-9])$)|(^((1[8-9]\d{2})|([2-9]\d{3}))(-)(02)(-)(2[0-8]|1[0-9]|0[1-9])$)|(^([2468][048]00)(-)(02)(-)(29)$)|(^([3579][26]00)(-)(02)(-)(29)$)|(^([1][89][0][48])(-)(02)(-)(29)$)|(^([2-9][0-9][0][48])(-)(02)(-)(29)$)|(^([1][89][2468][048])(-)(02)(-)(29)$)|(^([2-9][0-9][2468][048])(-)(02)(-)(29)$)|(^([1][89][13579][26])(-)(02)(-)(29)$)|(^([2-9][0-9][13579][26])(-)(02)(-)(29)$))/));
+          let DateResult = DateRes ? DateRes[0] : '';
+          if (DateResult != '') {
+            this.configs.DdWateringGroups[editIdx] = { GroupName: this.newGroup, WateringDate: DateResult }
+          } else {
+            vant.Toast('浇水截止日期格式不正确')
+          }
+        } else {
+          this.configs.DdWateringGroups[editIdx] = { GroupName: this.newGroup, WateringDate: '2122-01-01' }
+        }
       }
     },
     deleteGroup: function (idx) {
       this.$dialog.confirm({
-        message: '确认要删除' + this.configs.DdGroups_list[idx] + '吗？'
+        message: '确认要删除' + this.configs.DdWateringGroups[idx].GroupName + '吗？'
       }).then(() => {
-        this.configs.DdGroups_list.splice(idx, 1)
+        this.configs.DdWateringGroups.splice(idx, 1)
       }).catch(() => { })
     },
   },
@@ -371,16 +421,21 @@ const ChangeConfig = {
     <tip-block>配置进行操作的群组名称</tip-block>
     <van-cell-group>
       <div style="overflow:scroll;padding:1rem;background:#f1f1f1;">
-      <van-swipe-cell v-for="(Group,idx) in configs.DdGroups_list" :key="Group" stop-propagation>
-        <van-cell :title="Group" />
+      <van-swipe-cell v-for="(GroupInfo,idx) in configs.DdWateringGroups" :key="GroupInfo.GroupName" stop-propagation>
+        <van-cell :title="GroupInfo.GroupName" :label="GroupInfo.WateringDate"/>
         <template #right>
-          <van-button square type="danger" text="删除" @click="deleteGroup(idx)" />
+          <div style="display: flex;height: 100%;">
+            <van-button square type="primary" text="修改" @click="editGroup(idx)" style="height: 100%" />
+            <van-button square type="danger" text="删除" @click="deleteGroup(idx)" style="height: 100%" />
+          </div>
         </template>
       </van-swipe-cell>
       </div>
     </van-cell-group>
-    <van-dialog v-model="showAddGroupDialog" title="增加群组" show-cancel-button @confirm="doAddGroup" :get-container="getContainer">
+    <van-dialog v-model="showAddGroupDialog" title="增加群组" show-cancel-button @confirm="confirmAction" :get-container="getContainer">
       <van-field v-model="newGroup" placeholder="请输入群组名称" label="群组名称" />
+      <tip-block>浇水截止日期格式YYYY-MM-DD,例如2022-06-01,不填则默认为2122-01-01</tip-block>
+      <van-field v-model="newWateringDate" placeholder="请输入浇水截止日期" label="截止日期" />
     </van-dialog>
   </div>
   `
@@ -389,54 +444,110 @@ const ChangeConfig = {
 /**
  * 大号浇水群组列表设置
  */
- const GroupsConfig_Ex = {
+
+const GroupsConfig_Ex = {
   mixins: [mixin_common],
   data() {
     return {
-      showAddGroup_ExDialog: false,
-      newGroup_Ex: '',
+      showAddGroupExDialog: false,
+      isEdit: false,
+      newGroupEx: '',
+      newWateringDateEx: '',
+      editIdx: '',
       configs: {
-        DdGroups_list_Ex: ['1', '2', '3'],
+        DdWateringGroupsEx: [{ GroupName: 'a', WateringDate: '2022-06-10' }],
       }
     }
   },
   methods: {
-    addGroup_Ex: function () {
-      this.newGroup_Ex = ''
-      this.showAddGroup_ExDialog = true
+    addGroup: function () {
+      this.newGroupEx = ''
+      this.newWateringDateEx = ''
+      this.showAddGroupExDialog = true
+      this.isEdit = false
     },
-    doAddGroup_Ex: function () {
-      if (this.isNotEmpty(this.newGroup_Ex) && this.configs.DdGroups_list_Ex.indexOf(this.newGroup_Ex) < 0) {
-        this.configs.DdGroups_list_Ex.push(this.newGroup_Ex)
+    editGroup: function (idx) {
+      let target = this.configs.DdWateringGroupsEx[idx]
+      this.editIdx = idx
+      this.isEdit = true
+      this.newGroupEx = target.GroupName
+      this.newWateringDateEx = target.WateringDate
+      this.showAddGroupExDialog = true
+    },
+    confirmAction: function () {
+      if (this.isEdit) {
+        this.doEditGroup()
+      } else {
+        this.doAddGroup()
       }
     },
-    deleteGroup_Ex: function (idx) {
+    doAddGroup: function () {
+      if (this.isNotEmpty(this.newGroupEx) && this.configs.DdWateringGroupsEx.map(v => v.GroupName).indexOf(this.newGroupEx) < 0) {
+        if (this.isNotEmpty(this.newWateringDateEx)) {
+          let DateRes = this.newWateringDateEx.match(new RegExp(/((^((1[8-9]\d{2})|([2-9]\d{3}))(-)(10|12|0[13578])(-)(3[01]|[12][0-9]|0[1-9])$)|(^((1[8-9]\d{2})|([2-9]\d{3}))(-)(11|0?[469])(-)(30|[12][0-9]|0[1-9])$)|(^((1[8-9]\d{2})|([2-9]\d{3}))(-)(02)(-)(2[0-8]|1[0-9]|0[1-9])$)|(^([2468][048]00)(-)(02)(-)(29)$)|(^([3579][26]00)(-)(02)(-)(29)$)|(^([1][89][0][48])(-)(02)(-)(29)$)|(^([2-9][0-9][0][48])(-)(02)(-)(29)$)|(^([1][89][2468][048])(-)(02)(-)(29)$)|(^([2-9][0-9][2468][048])(-)(02)(-)(29)$)|(^([1][89][13579][26])(-)(02)(-)(29)$)|(^([2-9][0-9][13579][26])(-)(02)(-)(29)$))/));
+          let DateResult = DateRes ? DateRes[0] : '';
+          if (DateResult != '') {
+            this.configs.DdWateringGroupsEx.push({ GroupName: this.newGroupEx, WateringDate: DateResult })
+          } else {
+            vant.Toast('浇水截止日期格式不正确')
+          }
+        } else {
+          this.configs.DdWateringGroupsEx.push({ GroupName: this.newGroupEx, WateringDate: '2122-01-01' })
+        }
+      }
+    },
+    doEditGroup: function () {
+      if (this.isNotEmpty(this.newGroupEx)) {
+        let newGroupEx = this.newGroupEx
+        let editIdx = this.editIdx
+        if (this.configs.DdWateringGroupsEx.filter((v, idx) => v.GroupName == newGroupEx && idx != editIdx).length > 0) {
+          return
+        }
+        if (this.isNotEmpty(this.newWateringDateEx)) {
+          let DateRes = this.newWateringDateEx.match(new RegExp(/((^((1[8-9]\d{2})|([2-9]\d{3}))(-)(10|12|0[13578])(-)(3[01]|[12][0-9]|0[1-9])$)|(^((1[8-9]\d{2})|([2-9]\d{3}))(-)(11|0?[469])(-)(30|[12][0-9]|0[1-9])$)|(^((1[8-9]\d{2})|([2-9]\d{3}))(-)(02)(-)(2[0-8]|1[0-9]|0[1-9])$)|(^([2468][048]00)(-)(02)(-)(29)$)|(^([3579][26]00)(-)(02)(-)(29)$)|(^([1][89][0][48])(-)(02)(-)(29)$)|(^([2-9][0-9][0][48])(-)(02)(-)(29)$)|(^([1][89][2468][048])(-)(02)(-)(29)$)|(^([2-9][0-9][2468][048])(-)(02)(-)(29)$)|(^([1][89][13579][26])(-)(02)(-)(29)$)|(^([2-9][0-9][13579][26])(-)(02)(-)(29)$))/));
+          let DateResult = DateRes ? DateRes[0] : '';
+          if (DateResult != '') {
+            this.configs.DdWateringGroupsEx[editIdx] = { GroupName: this.newGroupEx, WateringDate: DateResult }
+          } else {
+            vant.Toast('浇水截止日期格式不正确')
+          }
+        } else {
+          this.configs.DdWateringGroupsEx[editIdx] = { GroupName: this.newGroupEx, WateringDate: '2122-01-01' }
+        }
+      }
+    },
+    deleteGroup: function (idx) {
       this.$dialog.confirm({
-        message: '确认要删除' + this.configs.DdGroups_list_Ex[idx] + '吗？'
+        message: '确认要删除' + this.configs.DdWateringGroupsEx[idx].GroupName + '吗？'
       }).then(() => {
-        this.configs.DdGroups_list_Ex.splice(idx, 1)
+        this.configs.DdWateringGroupsEx.splice(idx, 1)
       }).catch(() => { })
     },
   },
   template: `
   <div>
     <van-divider content-position="left">
-    大号浇水群组列表设置
-      <van-button style="margin-left: 0.4rem" plain hairline type="primary" size="mini" @click="addGroup_Ex">增加</van-button>
+      大号浇水群组列表设置
+      <van-button style="margin-left: 0.4rem" plain hairline type="primary" size="mini" @click="addGroup">增加</van-button>
     </van-divider>
     <tip-block>配置进行操作的群组名称</tip-block>
     <van-cell-group>
       <div style="overflow:scroll;padding:1rem;background:#f1f1f1;">
-      <van-swipe-cell v-for="(Group_Ex,idx) in configs.DdGroups_list_Ex" :key="Group_Ex" stop-propagation>
-        <van-cell :title="Group_Ex" />
+      <van-swipe-cell v-for="(GroupInfo,idx) in configs.DdWateringGroupsEx" :key="GroupInfo.GroupName" stop-propagation>
+        <van-cell :title="GroupInfo.GroupName" :label="GroupInfo.WateringDate"/>
         <template #right>
-          <van-button square type="danger" text="删除" @click="deleteGroup_Ex(idx)" />
+          <div style="display: flex;height: 100%;">
+            <van-button square type="primary" text="修改" @click="editGroup(idx)" style="height: 100%" />
+            <van-button square type="danger" text="删除" @click="deleteGroup(idx)" style="height: 100%" />
+          </div>
         </template>
       </van-swipe-cell>
       </div>
     </van-cell-group>
-    <van-dialog v-model="showAddGroup_ExDialog" title="增加群组" show-cancel-button @confirm="doAddGroup_Ex" :get-container="getContainer">
-      <van-field v-model="newGroup_Ex" placeholder="请输入群组名称" label="群组名称" />
+    <van-dialog v-model="showAddGroupExDialog" title="增加群组" show-cancel-button @confirm="confirmAction" :get-container="getContainer">
+      <van-field v-model="newGroupEx" placeholder="请输入群组名称" label="群组名称" />
+      <tip-block>浇水截止日期格式YYYY-MM-DD,例如2022-06-01,不填则默认为2122-01-01</tip-block>
+      <van-field v-model="newWateringDateEx" placeholder="请输入浇水截止日期" label="截止日期" />
     </van-dialog>
   </div>
   `

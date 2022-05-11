@@ -1,5 +1,6 @@
 let singletonRequire = require('../lib/SingletonRequirer.js')(runtime, global)
 let automator = singletonRequire('Automator')
+let args = engines.myEngine().execArgv
 var { default_config, config, storage_name: _storage_name } = require('../config.js')(runtime, global)
 /* importClass(android.graphics.Color);
 importClass(android.widget.AdapterView);
@@ -15,7 +16,7 @@ importClass(com.stardust.autojs.core.accessibility.AccessibilityBridge.WindowFil
             return true;
         }
 })); */
-
+log(args)
 main();
 
 
@@ -57,6 +58,12 @@ function closePage() {
     if (className("android.widget.FrameLayout").desc("关闭").exists()) {
         className("android.widget.FrameLayout").desc("关闭").click()
     }
+    if (idContains("h5_nav_back").desc("返回").exists()) {
+        try { idContains("h5_nav_back").desc("返回").findOne(1000).child(0).click() } catch (e) { }
+    }
+    if (idContains("back_button").desc("返回").exists()) {
+        try { idContains("back_button").desc("返回").findOne(1000).click() } catch (e) { }
+    }
 }
 
 function openPage() {
@@ -77,7 +84,11 @@ function main() {
         Ant_forest()
         sleep(2000)
         home()
-        if (config.auto_lock) { automator.lockScreen() }
+        log(typeof(config.auto_lock), typeof(args.needRelock), config.auto_lock && args.needRelock)
+        if ((config.auto_lock && args.needRelock)==true) {
+            log('重新锁定屏幕')
+            automator.lockScreen()
+          }
         exit();
     })
 }

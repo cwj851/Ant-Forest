@@ -8,7 +8,7 @@ let fileUtils = singletonRequire('FileUtils')
 let runningQueueDispatcher = singletonRequire('RunningQueueDispatcher')
 //let callStateListener = !config.is_pro && config.enable_call_state_control ? singletonRequire('CallStateListener') : { exitIfNotIdle: () => { } }
 let resourceMonitor = require('../lib/ResourceMonitor.js')(runtime, global)
-
+let args = engines.myEngine().execArgv
 /**
  * 主线程
  */
@@ -173,8 +173,8 @@ function start_app() {
 }
 
 function closeUpdata() {
-    if (textContains("稍候再说").exists() && textContains("立即更新").exists()) {
-        text("稍候再说").click();
+    if (textContains("稍后再说").exists() && textContains("立即更新").exists()) {
+        text("稍后再说").click();
     }
 }
 
@@ -184,6 +184,9 @@ function closePage() {
     }
     if (idContains("h5_nav_back").desc("返回").exists()) {
         try { idContains("h5_nav_back").desc("返回").findOne(1000).child(0).click() } catch (e) { }
+    }
+    if (idContains("back_button").desc("返回").exists()) {
+        try { idContains("back_button").desc("返回").findOne(1000).click() } catch (e) { }
     }
 }
 
@@ -393,7 +396,10 @@ function before_exit_hander(){
     if(resourceMonitor!=null){resourceMonitor.releaseAll()}
     interruptStopListenThread()
     events.removeAllListeners('key_down')
-    if (config.auto_lock) { automator.lockScreen() }
+    if ((config.auto_lock && args.needRelock)==true) {
+        log('重新锁定屏幕')
+        automator.lockScreen()
+      }
     runningQueueDispatcher.removeRunningTask()
     if (scanner !== null) {
         scanner.destroy()

@@ -32,6 +32,8 @@ let default_config = {
   //钉钉浇水设置参数
   DdGroups_list:[],
   DdGroups_list_Ex:[],
+  DdWateringGroups:[],
+  DdWateringGroupsEx:[],
   water_pattern:'1',
   water_keywords: '',                
   skip_keywords: '', 
