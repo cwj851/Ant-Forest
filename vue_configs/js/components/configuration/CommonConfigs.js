@@ -343,7 +343,7 @@ const GroupsConfig = {
       newWateringDate: '',
       editIdx: '',
       configs: {
-        DdWateringGroups: [{ GroupName: 'a', WateringDate: '2022-06-10' }],
+        DdWateringGroups: [{ GroupName: 'aD234往事永动轮种的去的', WateringDate: '2022-06-10' }],
       }
     }
   },
@@ -422,7 +422,16 @@ const GroupsConfig = {
     <van-cell-group>
       <div style="overflow:scroll;padding:1rem;background:#f1f1f1;">
       <van-swipe-cell v-for="(GroupInfo,idx) in configs.DdWateringGroups" :key="GroupInfo.GroupName" stop-propagation>
-        <van-cell :title="GroupInfo.GroupName" :label="GroupInfo.WateringDate"/>
+        <van-cell>
+        <template #title>
+        <van-icon name="friends-o" color="#1989fa" />
+        <span style="font-size: 10px;">合种群名：{{GroupInfo.GroupName}}</span>
+      </template>
+      <template #label>
+      <van-icon name="calendar-o" color="#ee0a24" />
+      <span style="font-size: 10px;">截止日期：{{GroupInfo.WateringDate}}</span>
+    </template>
+      </van-cell>
         <template #right>
           <div style="display: flex;height: 100%;">
             <van-button square type="primary" text="修改" @click="editGroup(idx)" style="height: 100%" />
@@ -434,7 +443,7 @@ const GroupsConfig = {
     </van-cell-group>
     <van-dialog v-model="showAddGroupDialog" title="增加群组" show-cancel-button @confirm="confirmAction" :get-container="getContainer">
       <van-field v-model="newGroup" placeholder="请输入群组名称" label="群组名称" />
-      <tip-block>浇水截止日期格式YYYY-MM-DD,例如2022-06-01,不填则默认为2122-01-01</tip-block>
+      <tip-block>浇水截止日期格式YYYY-MM-DD,例如2022-06-01,不填则默认为2122-01-01 注：截止日期当天不浇水</tip-block>
       <van-field v-model="newWateringDate" placeholder="请输入浇水截止日期" label="截止日期" />
     </van-dialog>
   </div>
@@ -534,7 +543,16 @@ const GroupsConfig_Ex = {
     <van-cell-group>
       <div style="overflow:scroll;padding:1rem;background:#f1f1f1;">
       <van-swipe-cell v-for="(GroupInfo,idx) in configs.DdWateringGroupsEx" :key="GroupInfo.GroupName" stop-propagation>
-        <van-cell :title="GroupInfo.GroupName" :label="GroupInfo.WateringDate"/>
+        <van-cell>
+        <template #title>
+        <van-icon name="friends-o" color="#1989fa" />
+        <span style="font-size: 10px;">合种群名：{{GroupInfo.GroupName}}</span>
+      </template>
+      <template #label>
+      <van-icon name="calendar-o" color="#ee0a24" />
+      <span style="font-size: 10px;">截止日期：{{GroupInfo.WateringDate}}</span>
+    </template>
+      </van-cell>
         <template #right>
           <div style="display: flex;height: 100%;">
             <van-button square type="primary" text="修改" @click="editGroup(idx)" style="height: 100%" />
@@ -546,7 +564,7 @@ const GroupsConfig_Ex = {
     </van-cell-group>
     <van-dialog v-model="showAddGroupExDialog" title="增加群组" show-cancel-button @confirm="confirmAction" :get-container="getContainer">
       <van-field v-model="newGroupEx" placeholder="请输入群组名称" label="群组名称" />
-      <tip-block>浇水截止日期格式YYYY-MM-DD,例如2022-06-01,不填则默认为2122-01-01</tip-block>
+      <tip-block>浇水截止日期格式YYYY-MM-DD,例如2022-06-01,不填则默认为2122-01-01 注：截止日期当天不浇水</tip-block>
       <van-field v-model="newWateringDateEx" placeholder="请输入浇水截止日期" label="截止日期" />
     </van-dialog>
   </div>
@@ -920,7 +938,16 @@ const SkipPackageConfig = {
     <tip-block>配置进行步数同步的小米运动账号</tip-block>
       <div style="min-height:10rem;overflow:scroll;padding:1rem;background:#f1f1f1;">
         <van-swipe-cell v-for="(HM,idx) in configs.huami_account_lists" :key="HM.username" stop-propagation>
-          <van-cell :title="HM.username" :label="HM.password" />
+          <van-cell>
+        <template #title>
+        <van-icon name="user-o" color="#1989fa" />
+        <span style="font-size: 10px;">账号：{{HM.username}}</span>
+      </template>
+      <template #label>
+      <van-icon name="bulb-o" color="#ee0a24" />
+      <span style="font-size: 10px;">密码：{{HM.password}}</span>
+    </template>
+      </van-cell>
           <template #right>
             <van-button square type="danger" text="删除" @click="deleteHMaccount(idx)" style="height: 100%"/>
           </template>
