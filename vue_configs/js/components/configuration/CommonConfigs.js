@@ -202,7 +202,7 @@ const ChangeConfig = {
         <switch-cell title="是否进入森林" v-model="configs.enter_forest" />
         <switch-cell title="是否自动打能量雨" v-model="configs.auto_Energy_rain" />
         <switch-cell title="是否浇水" v-model="configs.is_watering_friend" />
-        <van-notice-bar v-if="configs.is_watering_friend" wrapable :scrollable="false" text="浇水好友ID不是好友账号或者昵称，是以2088开头的蚂蚁森林ID，可以用XQ水晶能插件获取！"/>
+        <van-notice-bar v-if="configs.is_watering_friend" wrapable :scrollable="false" text="浇水好友ID不是好友账号或者昵称，是以2088开头的支付宝userid，提取userid方法请自行百度！"/>
         <tip-block v-if="configs.is_watering_friend">多个森林ID请用|符号分隔</tip-block>
         <van-field v-if="configs.is_watering_friend" v-model="configs.watering_friendId" label="浇水森林ID" label-width="10em" type="text" placeholder="请输入2088开头的好友森林ID" input-align="right" />
         <van-cell v-if="configs.is_watering_friend" center title="浇水数量">
@@ -224,7 +224,7 @@ const ChangeConfig = {
         </van-radio-group>
         </template>
         </van-cell>
-        <tip-block>XQ水晶不给大号增大道具的时候可以打开此开关由脚本给大号赠送道具</tip-block>
+        <tip-block>打开此开关由脚本给大号赠送道具，需要设置大号的userid。</tip-block>
         <switch-cell title="是否赠送道具" v-model="configs.send_tool" />
         <number-field v-if="configs.send_tool" v-model="configs.send_tool_friendId" label="赠送道具ID" label-width="8em" placeholder="请输入2088开头的好友ID" />
       </van-cell-group>
@@ -910,7 +910,7 @@ const SkipPackageConfig = {
         vant.Toast('请输入小米运动密码')
         return
       }
-      if (this.configs.huami_account_lists.indexOf(this.newHMuser) < 0) {
+      if (this.configs.huami_account_lists.map(v => v.username).indexOf(this.newHMuser) < 0) {
         this.configs.huami_account_lists.push({ username: this.newHMuser, password: this.newHMpassword })
       }
     },
@@ -920,6 +920,9 @@ const SkipPackageConfig = {
       }).then(() => {
         this.configs.huami_account_lists.splice(idx, 1)
       }).catch(() => { })
+    },
+    AddAccount: function () {
+      $app.invoke('AddHMAccount', {})
     },
     handlePackageChange: function (payload) {
       this.newHMuser = payload.username
@@ -932,6 +935,8 @@ const SkipPackageConfig = {
       小米运动同步步数账号设置
       <van-button style="margin-left: 0.4rem" plain hairline type="primary" size="mini" @click="addHMaccount">增加</van-button>
     </van-divider>
+    <tip-block>如需批量导入小米运动账号，请将账号文件命名为：小米运动账号.txt后存放在unit文件夹下。账号格式为：账号----密码(一行一个账号)：<van-button style="margin-left: 0.4rem" plain hairline type="primary" size="mini" @click="AddAccount">导入小米运动账号</van-button></tip-block>
+    <van-notice-bar wrapable :scrollable="false" text="同时支持小米运动手机账号和邮箱账号，手机账号请使用'+86手机号'这个格式"/>
     <van-cell-group>
     <number-field v-model="configs.step_min" label="改步最小值" placeholder="请输入改步最小值" />
     <number-field v-model="configs.step_max" label="改步最大值" placeholder="请输入改步最大值" />
