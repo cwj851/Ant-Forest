@@ -49,6 +49,8 @@ let default_config = {
   Master_Account: '',
   change_water_Num: 1000,
   intent_or_click:'b',
+  InviteWateringGroupList:[],
+  InviteWateringGroupListSum:[],
   //步数修改设置
   step_min: 18000,
   step_max: 21000,

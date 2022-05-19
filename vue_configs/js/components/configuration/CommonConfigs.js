@@ -442,9 +442,9 @@ const GroupsConfig = {
       </div>
     </van-cell-group>
     <van-dialog v-model="showAddGroupDialog" title="增加群组" show-cancel-button @confirm="confirmAction" :get-container="getContainer">
-      <van-field v-model="newGroup" placeholder="请输入群组名称" label="群组名称" />
-      <tip-block>浇水截止日期格式YYYY-MM-DD,例如2022-06-01,不填则默认为2122-01-01 注：截止日期当天不浇水</tip-block>
+      <van-field v-model="newGroup" required placeholder="请输入群组名称" label="群组名称" />
       <van-field v-model="newWateringDate" placeholder="请输入浇水截止日期" label="截止日期" />
+      <tip-block>浇水截止日期格式YYYY-MM-DD,例如2022-06-01,不填则默认为2122-01-01 注：截止日期当天不浇水</tip-block>
     </van-dialog>
   </div>
   `
@@ -563,9 +563,9 @@ const GroupsConfig_Ex = {
       </div>
     </van-cell-group>
     <van-dialog v-model="showAddGroupExDialog" title="增加群组" show-cancel-button @confirm="confirmAction" :get-container="getContainer">
-      <van-field v-model="newGroupEx" placeholder="请输入群组名称" label="群组名称" />
-      <tip-block>浇水截止日期格式YYYY-MM-DD,例如2022-06-01,不填则默认为2122-01-01 注：截止日期当天不浇水</tip-block>
+      <van-field v-model="newGroupEx" required placeholder="请输入群组名称" label="群组名称" />
       <van-field v-model="newWateringDateEx" placeholder="请输入浇水截止日期" label="截止日期" />
+      <tip-block>浇水截止日期格式YYYY-MM-DD,例如2022-06-01,不填则默认为2122-01-01 注：截止日期当天不浇水</tip-block>
     </van-dialog>
   </div>
   `
@@ -960,8 +960,257 @@ const SkipPackageConfig = {
       </div>
     </van-cell-group>
     <van-dialog v-model="showAddHMaccountDialog" title="增加小米运动账号" show-cancel-button @confirm="doaddHMaccount" :get-container="getContainer">
-      <van-field v-model="newHMuser" placeholder="请输入小米运动账号" label="账号" />
-      <van-field v-model="newHMpassword" placeholder="请输入小米运动密码" label="密码" />
+      <van-field v-model="newHMuser" required placeholder="请输入小米运动账号" label="账号" />
+      <van-field v-model="newHMpassword" required placeholder="请输入小米运动密码" label="密码" />
     </van-dialog>
   </div>`
 }
+
+
+/**
+ * 日榜查催设置
+ */
+
+ const DailyChartsCheckConfig = {
+  mixins: [mixin_common],
+  data() {
+    return {
+      showAddGroupDialog: false,
+      isEdit: false,
+      newGroup: '',
+      newWhiteList: '',
+      editIdx: '',
+      configs: {
+        InviteWateringGroupList: [{ groupName: 'aD234往事永动轮种的去的', whiteList: 'WS0001|WS0029|VIP|WS0029|VIP' }],
+      }
+    }
+  },
+  methods: {
+    addGroup: function () {
+      this.newGroup = ''
+      this.newWhiteList = ''
+      this.showAddGroupDialog = true
+      this.isEdit = false
+    },
+    editGroup: function (idx) {
+      let target = this.configs.InviteWateringGroupList[idx]
+      this.editIdx = idx
+      this.isEdit = true
+      this.newGroup = target.groupName
+      this.newWhiteList = target.whiteList
+      this.showAddGroupDialog = true
+    },
+    confirmAction: function () {
+      if (this.isEdit) {
+        this.doEditGroup()
+      } else {
+        this.doAddGroup()
+      }
+    },
+    doAddGroup: function () {
+      if (this.isNotEmpty(this.newGroup) && this.configs.InviteWateringGroupList.map(v => v.groupName).indexOf(this.newGroup) < 0) {
+        if (this.isNotEmpty(this.newWhiteList)) {
+            this.configs.InviteWateringGroupList.push({ groupName: this.newGroup, whiteList: this.newWhiteList })
+        } else {
+          this.configs.InviteWateringGroupList.push({ groupName: this.newGroup, whiteList: '' })
+        }
+      }
+    },
+    doEditGroup: function () {
+      if (this.isNotEmpty(this.newGroup)) {
+        let newGroup = this.newGroup
+        let editIdx = this.editIdx
+        if (this.configs.InviteWateringGroupList.filter((v, idx) => v.groupName == newGroup && idx != editIdx).length > 0) {
+          return
+        }
+        if (this.isNotEmpty(this.newWhiteList)) {      
+          this.configs.InviteWateringGroupList[editIdx] = { groupName: this.newGroup, whiteList: this.newWhiteList }   
+        } else {
+          this.configs.InviteWateringGroupList[editIdx] = { groupName: this.newGroup, whiteList: '' }   
+        }
+      }
+    },
+    deleteGroup: function (idx) {
+      this.$dialog.confirm({
+        message: '确认要删除' + this.configs.InviteWateringGroupList[idx].groupName + '吗？'
+      }).then(() => {
+        this.configs.InviteWateringGroupList.splice(idx, 1)
+      }).catch(() => { })
+    },
+  },
+  template: `
+  <div>
+    <van-divider content-position="left">
+      日榜查催群组列表设置
+      <van-button style="margin-left: 0.4rem" plain hairline type="primary" size="mini" @click="addGroup">增加</van-button>
+    </van-divider>
+    <tip-block>配置进行操作的群组名称</tip-block>
+    <van-cell-group>
+      <div style="overflow:scroll;padding:1rem;background:#f1f1f1;">
+      <van-swipe-cell v-for="(GroupInfo,idx) in configs.InviteWateringGroupList" :key="GroupInfo.groupName" stop-propagation>
+        <van-cell>
+        <template #title>
+        <van-icon name="friends-o" color="#1989fa" />
+        <span style="font-size: 10px;">合种群名：{{GroupInfo.groupName}}</span>
+      </template>
+      </van-cell>
+        <template #right>
+          <div style="display: flex;height: 100%;">
+            <van-button square type="primary" text="修改" @click="editGroup(idx)" style="height: 100%" />
+            <van-button square type="danger" text="删除" @click="deleteGroup(idx)" style="height: 100%" />
+          </div>
+        </template>
+      </van-swipe-cell>
+      </div>
+    </van-cell-group>
+    <van-dialog v-model="showAddGroupDialog" title="增加群组" show-cancel-button @confirm="confirmAction" :get-container="getContainer">
+      <van-field v-model="newGroup" required placeholder="请输入群组名称" label="群组名称" />
+      <van-field v-model="newWhiteList" placeholder="请输入查催白名单" label="白名单" />
+      <tip-block>多个白名单请用|分隔</tip-block>
+    </van-dialog>
+  </div>
+  `
+}
+
+/**
+ * VIP项目
+ */
+ const VIPConfigs = {
+  mixins: [mixin_common],
+  data () {
+    return {
+    }
+  },
+  template: `
+  <div>
+    <van-cell-group>
+    <van-cell title="日榜查催群组列表配置" is-link @click="routerTo('/advance/VIP/DailyChartsCheck')"/>
+    <van-cell title="总榜查催群组列表配置" is-link @click="routerTo('/advance/VIP/SumChartsCheck')"/>
+    </van-cell-group>
+  </div>
+  `
+}
+
+/**
+ * 日榜查催设置
+ */
+
+ const SumChartsCheckConfig = {
+  mixins: [mixin_common],
+  data() {
+    return {
+      showAddGroupDialog: false,
+      isEdit: false,
+      newGroup: '',
+      newWhiteList: '',
+      newCheckNum: '',
+      editIdx: '',
+      configs: {
+        InviteWateringGroupListSum: [{ groupName: 'aD234往事永动轮种的去的', whiteList: 'WS0001|WS002989157|VIP',CheckNum:'20000' }],
+      }
+    }
+  },
+  methods: {
+    addGroup: function () {
+      this.newGroup = ''
+      this.newWhiteList = ''
+      this.newCheckNum = ''
+      this.showAddGroupDialog = true
+      this.isEdit = false
+    },
+    editGroup: function (idx) {
+      let target = this.configs.InviteWateringGroupListSum[idx]
+      this.editIdx = idx
+      this.isEdit = true
+      this.newGroup = target.groupName
+      this.newWhiteList = target.whiteList
+      this.newCheckNum = target.CheckNum
+      this.showAddGroupDialog = true
+    },
+    confirmAction: function () {
+      if (this.isEdit) {
+        this.doEditGroup()
+      } else {
+        this.doAddGroup()
+      }
+    },
+    doAddGroup: function () {
+      if (this.isNotEmpty(this.newGroup) && this.configs.InviteWateringGroupListSum.map(v => v.groupName).indexOf(this.newGroup) < 0 ) {
+        if(!this.isNotEmpty(this.newCheckNum)){
+          vant.Toast('总水量不能空！')
+          return
+        }
+        if (this.isNotEmpty(this.newWhiteList)) {
+            this.configs.InviteWateringGroupListSum.push({ groupName: this.newGroup, whiteList: this.newWhiteList,CheckNum:this.newCheckNum })
+        } else {
+          this.configs.InviteWateringGroupListSum.push({ groupName: this.newGroup, whiteList: '' ,CheckNum:this.newCheckNum })
+        }
+      }
+    },
+    doEditGroup: function () {
+      if (this.isNotEmpty(this.newGroup)) {
+        let newGroup = this.newGroup
+        let editIdx = this.editIdx
+        if (this.configs.InviteWateringGroupListSum.filter((v, idx) => v.groupName == newGroup && idx != editIdx).length > 0) {
+          return
+        }
+        if (this.isNotEmpty(this.newCheckNum)) {
+          if (this.isNotEmpty(this.newWhiteList)) {
+            this.configs.InviteWateringGroupListSum[editIdx] = { groupName: this.newGroup, whiteList: this.newWhiteList, CheckNum: this.newCheckNum }
+          } else {
+            this.configs.InviteWateringGroupListSum[editIdx] = { groupName: this.newGroup, whiteList: '', CheckNum: this.newCheckNum }
+          }
+        }else{
+          vant.Toast('总水量不能空！')
+        }
+      }
+    },
+    deleteGroup: function (idx) {
+      this.$dialog.confirm({
+        message: '确认要删除' + this.configs.InviteWateringGroupListSum[idx].groupName + '吗？'
+      }).then(() => {
+        this.configs.InviteWateringGroupListSum.splice(idx, 1)
+      }).catch(() => { })
+    },
+  },
+  template: `
+  <div>
+    <van-divider content-position="left">
+      总榜查催群组列表设置
+      <van-button style="margin-left: 0.4rem" plain hairline type="primary" size="mini" @click="addGroup">增加</van-button>
+    </van-divider>
+    <tip-block>配置进行操作的群组名称</tip-block>
+    <van-notice-bar left-icon="volume-o" text="查崔总水量请去尾后设置成100的倍数，例如总水量为8888g时需要设置为8800！"/>
+    <van-cell-group>
+      <div style="overflow:scroll;padding:1rem;background:#f1f1f1;">
+      <van-swipe-cell v-for="(GroupInfo,idx) in configs.InviteWateringGroupListSum" :key="GroupInfo.groupName" stop-propagation>
+        <van-cell>
+        <template #title>
+        <van-icon name="friends-o" color="#1989fa" />
+        <span style="font-size: 10px;">合种群名：{{GroupInfo.groupName}}</span>
+      </template>
+      <template #label>
+      <van-icon name="flower-o" color="#ee0a24" />
+      <span style="font-size: 10px;">总水量：{{GroupInfo.CheckNum}}g</span>
+    </template>
+      </van-cell>
+        <template #right>
+          <div style="display: flex;height: 100%;">
+            <van-button square type="primary" text="修改" @click="editGroup(idx)" style="height: 100%" />
+            <van-button square type="danger" text="删除" @click="deleteGroup(idx)" style="height: 100%" />
+          </div>
+        </template>
+      </van-swipe-cell>
+      </div>
+    </van-cell-group>
+    <van-dialog v-model="showAddGroupDialog" title="增加群组" show-cancel-button @confirm="confirmAction" :get-container="getContainer">
+      <van-field v-model="newGroup" required placeholder="请输入群组名称" label="群组名称" />
+      <van-field v-model="newCheckNum" required placeholder="请输入查催水量" label="总水量(g)" type="digit" />
+      <van-field v-model="newWhiteList"  placeholder="请输入查催白名单" label="白名单" />
+      <tip-block>多个白名单请用|分隔</tip-block>
+    </van-dialog>
+  </div>
+  `
+}
+
+//number-field

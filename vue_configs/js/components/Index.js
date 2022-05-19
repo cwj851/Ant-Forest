@@ -28,6 +28,10 @@ let Index = {
           link: '/basic/Ddwater'
         },
         {
+          title: 'VIP功能',
+          link: '/advance/VIP'
+        },
+        {
           title: '悬浮窗设置',
           link: '/basic/floaty'
         },
