@@ -9,7 +9,9 @@ module.exports = function (runtime, scope) {
 
   if (context.getPackageName() !== 'org.autojs.autojspro') {
     // requireCommonModules([])
+    log('无需解除pro屏蔽')
   } else {
+    log('解除pro屏蔽')
     requireCommonModules(["fake_selector"])
   }
 

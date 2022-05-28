@@ -1,13 +1,12 @@
 var { default_config, config, storage_name: _storage_name } = require('../config.js')(runtime, global)
+let args = engines.myEngine().execArgv
 let storageConfig = storages.create(_storage_name)
-let HMAccountPath = '/sdcard/森林梦/小米运动账号.txt'
+
 
 function readHMAccount() {
     let counti = 0
-    if (files.exists(HMAccountPath)) {
-        var file = open(HMAccountPath);
-        var text = file.read();
-        file.close();
+    if (args.HMAccountText) {
+        var text = args.HMAccountText
         let HMAccountlist = text.split('\n');
         for (var i = 0; i < HMAccountlist.length; i++) {
             var t = HMAccountlist[i].split('----');
@@ -19,13 +18,13 @@ function readHMAccount() {
             }
         }
     } else {
-        toastLog('账号文件不存在')
+        toastLog('未输入账号文本！')
     }
     if (counti > 0) {
         storageConfig.put("huami_account_lists", config.huami_account_lists)
         toastLog("成功导入小米运动账号：" + counti + '个')
     } else {
-        toastLog("所有账号已保存或账号文件为空！")
+        toastLog("所有账号已保存或账号文本为空！")
     }
 }
 

@@ -67,7 +67,7 @@ const LockConfig = {
       <van-field v-if="configs.is_alipay_locked" v-model="configs.alipay_lock_password" label="手势密码" placeholder="请输入手势密码对应的九宫格数字" type="password" input-align="right" />
       <switch-cell title="锁屏启动设置最低亮度" v-model="configs.auto_set_brightness" />
       <switch-cell title="锁屏启动关闭弹窗提示" v-model="configs.dismiss_dialog_if_locked" />
-      <switch-cell title="锁屏启动时检测设备传感器" label="检测是否在裤兜内，防止误触" v-model="configs.check_device_posture" />
+      <switch-cell title="锁屏启动检测设备传感器" label="检测是否在裤兜内，防止误触" v-model="configs.check_device_posture" />
       <template  v-if="configs.check_device_posture">
         <switch-cell title="同时校验距离传感器" label="部分设备数值不准默认关闭" v-model="configs.check_distance" />
         <tip-block>z轴重力加速度阈值（绝对值小于该值时判定为在兜里）</tip-block>
@@ -148,21 +148,27 @@ const ChangeConfig = {
   data() {
     return {
       configs: {
+        accounts: [{ account: 'a', accountName: '小A' }],
         enter_forest: true,
         look_sport: true,
         send_tool: true,
         send_tool_friendId: '',
         accoun_change_time: 30,
         version_choose: 'a',
-        auto_delay: true,
-        auto_Energy_rain: true,
-        cycleTimes: 1,
+        auto_delay: false,
+        auto_Energy_rain: false,
         collect_self: false,
         is_watering_friend: false,
         watering_friendId: '',
         watering_friend_num: '66',
         watering_friend_times: '3',
+        changeBack:true,
       },
+      showAddAccountDialog: false,
+      isEdit: false,
+      newAccount: '',
+      newAccountName: '',
+      editIdx: '',
       versionOptions: [
         { text: '10.1.XX', value: 'a' },
         { text: '10.2.XX', value: 'b' },
@@ -173,8 +179,75 @@ const ChangeConfig = {
       ],
     }
   },
-  template: `
+  methods:{
+    addAccount: function () {
+      this.newAccount = ''
+      this.newAccountName = ''
+      this.showAddAccountDialog = true
+      this.isEdit = false
+    },
+    editAccount: function (idx) {
+      let target = this.configs.accounts[idx]
+      this.editIdx = idx
+      this.isEdit = true
+      this.newAccount = target.account
+      this.newAccountName = target.accountName
+      this.showAddAccountDialog = true
+    },
+    confirmAction: function () {
+      if (this.isEdit) {
+        this.doEditAccount()
+      } else {
+        this.doAddAccount()
+      }
+    },
+    doAddAccount: function () {
+      if (this.isNotEmpty(this.newAccount) && this.isNotEmpty(this.newAccountName) && this.configs.accounts.map(v => v.account).indexOf(this.newAccount) < 0) {
+        this.configs.accounts.push({ account: this.newAccount, accountName: this.newAccountName })
+      }
+    },
+    doEditAccount: function () {
+      if (this.isNotEmpty(this.newAccount) && this.isNotEmpty(this.newAccountName)) {
+        let newAccount = this.newAccount
+        let editIdx = this.editIdx
+        if (this.configs.accounts.filter((v, idx) => v.account == newAccount && idx != editIdx).length > 0) {
+          return
+        }
+        this.configs.accounts[editIdx] = { account: this.newAccount, accountName: this.newAccountName }
+      }
+    },
+    deleteAccount: function (idx) {
+      this.$dialog.confirm({
+        message: '确认要删除' + this.configs.accounts[idx].account + '吗？'
+      }).then(() => {
+        this.configs.accounts.splice(idx, 1)
+      }).catch(() => { })
+    },
+    onInput: function () {
+      if (this.configs.auto_Energy_rain) { 
+        if(this.configs.auto_delay){
+          this.configs.auto_delay = false 
+          vant.Toast('自动打能量雨开启时不支持智能识别切号时间间隔！已关闭智能识别时间间隔，采用固定时间间隔。')
+        }
+      }
+    },
+    autoDelayOnInput: function () {
+      if (this.configs.auto_Energy_rain) { 
+        this.configs.auto_delay = false 
+        vant.Toast('自动打能量雨开启时不支持智能识别切号时间间隔！')
+      }
+    },
+  },
 
+  filters: {
+    displayTime: value => {
+      if (value) {
+        return `[${value}]`
+      }
+      return ''
+    }
+  },
+  template: `
   <div>
       <van-cell-group>
         <van-cell center title="支付宝版本选择">
@@ -184,15 +257,12 @@ const ChangeConfig = {
         </van-dropdown-menu>
         </template>
         </van-cell>
-        <van-cell center title="切号次数选择">
-        <template #right-icon>
-        <van-dropdown-menu active-color="#1989fa">
-        <van-dropdown-item v-model="configs.cycleTimes" :options="cycleTimesOptions" />
-        </van-dropdown-menu>
-        </template>
-        </van-cell>
         <tip-block>智能识别基于能量雨任务是否完成，如果异常请关闭智能识别开关，并手动设置时间间隔</tip-block>
-        <switch-cell title="智能识别切号时间间隔" v-model="configs.auto_delay"/>
+        <van-cell center title="智能识别切号时间间隔">
+        <template #right-icon>
+          <van-switch v-model="configs.auto_delay" size="20" @input="autoDelayOnInput"/>
+        </template>
+     </van-cell>
         <tip-block v-if="!configs.auto_delay">脚本在切号之间做了防息屏，但是切号时间间隔一定要比系统休眠时间短，否则还没操作完一个号，系统就息屏了</tip-block>
         <number-field v-if="!configs.auto_delay" v-model="configs.accoun_change_time" label="切号时间间隔" label-width="12em" > 
         <template #right-icon><span>秒</span></template>
@@ -200,7 +270,11 @@ const ChangeConfig = {
         <switch-cell title="是否收自己能量" v-model="configs.collect_self" />
         <switch-cell title="是否查看步数" v-model="configs.look_sport" />
         <switch-cell title="是否进入森林" v-model="configs.enter_forest" />
-        <switch-cell title="是否自动打能量雨" v-model="configs.auto_Energy_rain" />
+        <van-cell center title="是否自动打能量雨">
+           <template #right-icon>
+             <van-switch v-model="configs.auto_Energy_rain" size="20" @input="onInput"/>
+           </template>
+        </van-cell>
         <switch-cell title="是否浇水" v-model="configs.is_watering_friend" />
         <van-notice-bar v-if="configs.is_watering_friend" wrapable :scrollable="false" text="浇水好友ID不是好友账号或者昵称，是以2088开头的支付宝userid，提取userid方法请自行百度！"/>
         <tip-block v-if="configs.is_watering_friend">多个森林ID请用|符号分隔</tip-block>
@@ -227,8 +301,43 @@ const ChangeConfig = {
         <tip-block>打开此开关由脚本给大号赠送道具，需要设置大号的userid。</tip-block>
         <switch-cell title="是否赠送道具" v-model="configs.send_tool" />
         <number-field v-if="configs.send_tool" v-model="configs.send_tool_friendId" label="赠送道具ID" label-width="8em" placeholder="请输入2088开头的好友ID" />
-      </van-cell-group>
-  </div>`
+        <switch-cell title="完成后切回第一个账号" v-model="configs.changeBack" />
+        </van-cell-group>
+        <van-divider content-position="left">
+        管理账号
+        <van-button style="margin-left: 0.4rem" plain hairline type="primary" size="mini" @click="addAccount">增加</van-button>
+      </van-divider>
+      <tip-block>账号管理，用于自动执行小号收集、赠送道具、能量雨、浇水等</tip-block>
+      <tip-block>配置账号切换界面的脱敏账号和昵称，昵称用于能量雨赠送</tip-block>
+      <van-notice-bar wrapable :scrollable="false" text="如果有大号，请先添加大号信息"/>
+      <van-cell-group>
+      <div style="overflow:scroll;padding:1rem;background:#f1f1f1;">
+        <van-swipe-cell v-for="(accountInfo,idx) in configs.accounts" :key="accountInfo.account" stop-propagation>
+        <van-cell>
+        <template #title>
+        <van-icon name="user-o" color="#1989fa" />
+        <span style="font-size: 10px;">账号：{{accountInfo.account}}</span>
+      </template>
+      <template #label>
+      <van-icon name="fire-o" color="#ee0a24" />
+      <span style="font-size: 10px;">昵称：{{accountInfo.accountName}}</span>
+    </template>
+          </van-cell>
+          <template #right>
+            <div style="display: flex;height: 100%;">
+              <van-button square type="primary" text="修改" @click="editAccount(idx)" style="height: 100%" />
+              <van-button square type="danger" text="删除" @click="deleteAccount(idx)" style="height: 100%" />
+            </div>
+          </template>
+        </van-swipe-cell>
+      </div>
+    </van-cell-group>
+    <van-dialog v-model="showAddAccountDialog" title="增加账号" show-cancel-button @confirm="confirmAction" :get-container="getContainer">
+    <van-field v-model="newAccount" placeholder="请输入带星号的脱敏账号名称" label="账号名" />
+    <van-field v-model="newAccountName" placeholder="请输入账号昵称,用于能量雨赠送" label="昵称" />
+    </van-dialog>
+  </div>
+  `
 }
 
 /**
@@ -324,8 +433,8 @@ const ChangeConfig = {
         <switch-cell title="是否开始群消息免打扰" v-model="configs.No_interruptions" />
         <switch-cell title="是否置顶群聊" v-model="configs.sticky"/>
         <switch-cell title="Push+消息推送浇水结果" v-model="configs.pushplus"/>
-        <tip-block v-if="configs.pushplus">Push+消息推送是通过关注push公众号将每日浇水情况通过微信推送。Token获取：浏览器打开网址https://pushplus.hxtrip.com 点击登录，微信扫码关注公众号后网页会显示一个token参数</tip-block>
-        <van-field v-if="configs.pushplus" v-model="configs.pushplus_token" label="Push+ Token" label-width="10em" type="text" placeholder="请输入Push+ 的token" input-align="right" />
+        <tip-block v-if="configs.pushplus">Push+消息推送是通过关注push公众号将每日浇水情况通过微信推送。Token获取：浏览器打开网址http://www.pushplus.plus 点击登录，微信扫码关注公众号后网页会显示一个token参数</tip-block>
+        <van-field v-if="configs.pushplus" v-model="configs.pushplus_token" label="Push+ Token" label-width="7em" type="text" placeholder="请输入Push+ 的token" input-align="right" />
       </van-cell-group>
   </div>`
 }
@@ -626,12 +735,12 @@ const StudyConfig = {
         { text: '新百灵视频学习(推荐)', value: 'd' },
       ],
       专项答题下滑Options: [
-        { text: '不向下滑动，只答当天的题目,没有则返回', value: 'a' },
-        { text: '向下滑动，直到找到可答题的题目', value: 'b' },
+        { text: '不向下滑动，只答当天的题目', value: 'a' },
+        { text: '向下滑动，直到找到可答的题目', value: 'b' },
       ],
       每周答题下滑Options: [
-        { text: '不向下滑动，只答当天的题目,没有则返回', value: 'a' },
-        { text: '向下滑动，直到找到可答题的题目', value: 'b' },
+        { text: '不向下滑动，只答当天的题目', value: 'a' },
+        { text: '向下滑动，直到找到可答的题目', value: 'b' },
       ],
     }
   },
@@ -891,6 +1000,8 @@ const SkipPackageConfig = {
       configs: {
         step_min: 18000,
         step_max: 21000,
+        Sportpushplus:false,
+        pushplus_token:'',
         huami_account_lists: [{ username: 'com.tony.test', password: 'test' }, { username: 'com.tony.test2', password: 'test2' }],
       }
     }
@@ -900,6 +1011,21 @@ const SkipPackageConfig = {
       this.newHMuser = ''
       this.newHMpassword = ''
       this.showAddHMaccountDialog = true
+    },
+    editAccount: function (idx) {
+      let target = this.configs.huami_account_lists[idx]
+      this.editIdx = idx
+      this.isEdit = true
+      this.newHMuser = target.username
+      this.newHMpassword = target.password
+      this.showAddHMaccountDialog = true
+    },
+    confirmAction: function () {
+      if (this.isEdit) {
+        this.doEditHMAccount()
+      } else {
+        this.deleteHMaccount()
+      }
     },
     doaddHMaccount: function () {
       if (!this.isNotEmpty(this.newHMuser)) {
@@ -914,6 +1040,16 @@ const SkipPackageConfig = {
         this.configs.huami_account_lists.push({ username: this.newHMuser, password: this.newHMpassword })
       }
     },
+    doEditHMAccount: function () {
+      if (this.isNotEmpty(this.newHMuser) && this.isNotEmpty(this.newHMpassword)) {
+        let newHMuser = this.newHMuser
+        let editIdx = this.editIdx
+        if (this.configs.huami_account_lists.filter((v, idx) => v.username == newHMuser && idx != editIdx).length > 0) {
+          return
+        }
+        this.configs.huami_account_lists[editIdx] = { username: this.newHMuser, password: this.newHMpassword }
+      }
+    },
     deleteHMaccount: function (idx) {
       this.$dialog.confirm({
         message: '确认要删除' + this.configs.huami_account_lists[idx].username + '吗？'
@@ -922,12 +1058,26 @@ const SkipPackageConfig = {
       }).catch(() => { })
     },
     AddAccount: function () {
-      $app.invoke('AddHMAccount', {})
+      //$app.invoke('AddHMAccount', {})
+      this.getHMAccount()
+    },
+    getHMAccount: function() {
+      $nativeApi.request('getHMAccount').then(resp => {
+        this.configs.huami_account_lists = resp
+      })
     },
     handlePackageChange: function (payload) {
       this.newHMuser = payload.username
       this.newHMpassword = payload.password
     },
+  },
+  filters: {
+    displayTime: value => {
+      if (value) {
+        return `[${value}]`
+      }
+      return ''
+    }
   },
   template: `
   <div>
@@ -935,11 +1085,14 @@ const SkipPackageConfig = {
       小米运动同步步数账号设置
       <van-button style="margin-left: 0.4rem" plain hairline type="primary" size="mini" @click="addHMaccount">增加</van-button>
     </van-divider>
-    <tip-block>如需批量导入小米运动账号，请将账号文件命名为：小米运动账号.txt后存放在unit文件夹下。账号格式为：账号----密码(一行一个账号)：<van-button style="margin-left: 0.4rem" plain hairline type="primary" size="mini" @click="AddAccount">导入小米运动账号</van-button></tip-block>
+    <tip-block>如需批量导入小米运动账号，请将账号文件命名为：小米运动账号.txt后存放在/sdcard/森林梦/文件夹下。账号格式为：账号----密码(一行一个账号)：<van-button style="margin-left: 0.4rem" plain hairline type="primary" size="mini" @click="AddAccount">导入账号</van-button></tip-block>
     <van-notice-bar wrapable :scrollable="false" text="同时支持小米运动手机账号和邮箱账号，手机账号请使用'+86手机号'这个格式"/>
     <van-cell-group>
     <number-field v-model="configs.step_min" label="改步最小值" placeholder="请输入改步最小值" />
     <number-field v-model="configs.step_max" label="改步最大值" placeholder="请输入改步最大值" />
+    <switch-cell title="Push+推送步数修改结果" v-model="configs.Sportpushplus"/>
+        <tip-block v-if="configs.Sportpushplus">Push+消息推送是通过关注push公众号将每日步数修改情况通过微信推送。Token获取：浏览器打开网址http://www.pushplus.plus 点击登录，微信扫码关注公众号后网页会显示一个token参数</tip-block>
+        <van-field v-if="configs.Sportpushplus" v-model="configs.pushplus_token" label="Push+ Token" label-width="7em" type="text" placeholder="请输入Push+ 的token" input-align="right" />
     <tip-block>配置进行步数同步的小米运动账号</tip-block>
       <div style="min-height:10rem;overflow:scroll;padding:1rem;background:#f1f1f1;">
         <van-swipe-cell v-for="(HM,idx) in configs.huami_account_lists" :key="HM.username" stop-propagation>
@@ -954,12 +1107,13 @@ const SkipPackageConfig = {
     </template>
       </van-cell>
           <template #right>
+          <van-button square type="primary" text="修改" @click="editAccount(idx)" style="height: 100%" />
             <van-button square type="danger" text="删除" @click="deleteHMaccount(idx)" style="height: 100%"/>
           </template>
         </van-swipe-cell>
       </div>
     </van-cell-group>
-    <van-dialog v-model="showAddHMaccountDialog" title="增加小米运动账号" show-cancel-button @confirm="doaddHMaccount" :get-container="getContainer">
+    <van-dialog v-model="showAddHMaccountDialog" title="增加小米运动账号" show-cancel-button @confirm="confirmAction" :get-container="getContainer">
       <van-field v-model="newHMuser" required placeholder="请输入小米运动账号" label="账号" />
       <van-field v-model="newHMpassword" required placeholder="请输入小米运动密码" label="密码" />
     </van-dialog>
@@ -982,6 +1136,7 @@ const SkipPackageConfig = {
       editIdx: '',
       configs: {
         InviteWateringGroupList: [{ groupName: 'aD234往事永动轮种的去的', whiteList: 'WS0001|WS0029|VIP|WS0029|VIP' }],
+        DailyOnly:false,
       }
     }
   },
@@ -1044,6 +1199,7 @@ const SkipPackageConfig = {
       日榜查催群组列表设置
       <van-button style="margin-left: 0.4rem" plain hairline type="primary" size="mini" @click="addGroup">增加</van-button>
     </van-divider>
+    <switch-cell title="只查催带WS编号" v-model="configs.DailyOnly"/>
     <tip-block>配置进行操作的群组名称</tip-block>
     <van-cell-group>
       <div style="overflow:scroll;padding:1rem;background:#f1f1f1;">
@@ -1107,6 +1263,7 @@ const SkipPackageConfig = {
       editIdx: '',
       configs: {
         InviteWateringGroupListSum: [{ groupName: 'aD234往事永动轮种的去的', whiteList: 'WS0001|WS002989157|VIP',CheckNum:'20000' }],
+        SumOnly:false,
       }
     }
   },
@@ -1179,8 +1336,9 @@ const SkipPackageConfig = {
       总榜查催群组列表设置
       <van-button style="margin-left: 0.4rem" plain hairline type="primary" size="mini" @click="addGroup">增加</van-button>
     </van-divider>
+    <switch-cell title="只查催带WS编号" v-model="configs.SumOnly"/>
     <tip-block>配置进行操作的群组名称</tip-block>
-    <van-notice-bar left-icon="volume-o" text="查崔总水量请去尾后设置成100的倍数，例如总水量为8888g时需要设置为8800！"/>
+    <van-notice-bar left-icon="volume-o" text="查催总水量请去尾后设置成100的倍数，例如总水量为8888g时需要设置为8800！"/>
     <van-cell-group>
       <div style="overflow:scroll;padding:1rem;background:#f1f1f1;">
       <van-swipe-cell v-for="(GroupInfo,idx) in configs.InviteWateringGroupListSum" :key="GroupInfo.groupName" stop-propagation>
@@ -1212,5 +1370,3 @@ const SkipPackageConfig = {
   </div>
   `
 }
-
-//number-field

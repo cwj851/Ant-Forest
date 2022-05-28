@@ -38,10 +38,10 @@ console.log('======加入任务队列成功=======')
 
 events.on('exit', function () {
     config.isRunning = false
-  })
-  //callStateListener.exitIfNotIdle()
-  // 注册自动移除运行中任务
-  _commonFunctions.registerOnEngineRemoved(function () {
+})
+//callStateListener.exitIfNotIdle()
+// 注册自动移除运行中任务
+_commonFunctions.registerOnEngineRemoved(function () {
     config.resetBrightness && config.resetBrightness()
     //debugInfo('校验并移除已加载的dex')
     resolver()
@@ -50,11 +50,11 @@ events.on('exit', function () {
     _commonFunctions.reduceConsoleLogs()
     // 移除运行中任务
     runningQueueDispatcher.removeRunningTask(true, true,
-      () => {
-        config.isRunning = false
-      }
+        () => {
+            config.isRunning = false
+        }
     )
-  }, 'DdWatering')
+}, 'DdWatering')
 
 water_lists = config.water_keywords.split('|')
 skip_lists = config.skip_keywords.split('|')
@@ -62,15 +62,15 @@ skip_lists = config.skip_keywords.split('|')
 let FloatyInstance = singletonRequire('FloatyUtil')
 // 初始化悬浮窗
 if (config.show_small_floaty) {
-  if (!FloatyInstance.init()) {
-    runningQueueDispatcher.removeRunningTask()
-    sleep(6000)
-    console.error('悬浮窗初始化失败, 请查看悬浮窗权限！')
-    before_exit_hander()
-    setTimeout(() => { exit() }, 1000 * 5)
-  }
-  // 自动设置刘海偏移量
-  _commonFunctions.autoSetUpBangOffset()
+    if (!FloatyInstance.init()) {
+        runningQueueDispatcher.removeRunningTask()
+        sleep(6000)
+        console.error('悬浮窗初始化失败, 请查看悬浮窗权限！')
+        before_exit_hander()
+        setTimeout(() => { exit() }, 1000 * 5)
+    }
+    // 自动设置刘海偏移量
+    _commonFunctions.autoSetUpBangOffset()
 }
 
 function interruptStopListenThread() {
@@ -79,9 +79,9 @@ function interruptStopListenThread() {
         stopListenThread = null
     }
 }
-  /**
- * 监听音量上键直接关闭 音量下延迟5分钟
- */
+/**
+* 监听音量上键直接关闭 音量下延迟5分钟
+*/
 function listenStopCollect() {
     interruptStopListenThread()
     stopListenThread = threads.start(function () {
@@ -110,19 +110,19 @@ function listenStopCollect() {
 
 function floaty_show_text(text) {
     if (config.show_small_floaty) {
-      _commonFunctions.showTextFloaty(">>>"+text)
+        _commonFunctions.showTextFloaty(">>>" + text)
     }
 }
 
-function before_exit_hander(){
+function before_exit_hander() {
     interruptStopListenThread()
     events.removeAllListeners('key_down')
-    if ((config.auto_lock && args.needRelock)==true) {
+    if ((config.auto_lock && args.needRelock) == true) {
         log('重新锁定屏幕')
         automator.lockScreen()
-      }
+    }
     runningQueueDispatcher.removeRunningTask()
-      _commonFunctions.reduceConsoleLogs()
+    _commonFunctions.reduceConsoleLogs()
 }
 
 function delay(seconds) {
@@ -135,8 +135,6 @@ function delay(seconds) {
  */
 
 function start_app() {
-    //console.setPosition(0, device.height / 20); //部分华为手机console有bug请注释本行
-    // console.show(); //部分华为手机console有bug请注释本行
     logUtils.debugInfo("正在启动app...");
     floaty_show_text("正在启动app...")
     if (!(launchApp("钉钉") || launch('com.alibaba.android.rimet'))) //
@@ -232,9 +230,9 @@ function main() {
         }
     }
 
-/*     _conThread = threads.start(function () {
-        Dream.ConSole()
-    }) */
+    /*     _conThread = threads.start(function () {
+            Dream.ConSole()
+        }) */
     _golThread = threads.start(function () {
         //killApp("钉钉")
         //console.show();
@@ -266,7 +264,7 @@ function main() {
         sleep(2000)
         home()
         before_exit_hander()
-        try{setTimeout(() => { exit() }, 1000 * 5);}catch(e){}
+        try { setTimeout(() => { exit() }, 1000 * 5); } catch (e) { }
     })
 }
 
@@ -299,8 +297,8 @@ function watering_by_grouplists_EX() {
 }
 
 function watering_by_grouplists() {
-/*     let Group_list=config.DdGroups_list
-    let Group_list_length=Group_list.length */
+    /*     let Group_list=config.DdGroups_list
+        let Group_list_length=Group_list.length */
     config.DdGroups_list = []
     for (var k = 0; k < config.DdWateringGroups.length; k++) {
         if (InDate(config.DdWateringGroups[k].WateringDate)) {
@@ -359,7 +357,7 @@ function watering_by_grouplists() {
 function InDate(Datestr) {
     var oDate1 = new Date();
     var oDate2 = new Date(Datestr);
-    if(oDate1.getTime() > (oDate2.getTime()-8*60*60*1000)){
+    if (oDate1.getTime() > (oDate2.getTime() - 8 * 60 * 60 * 1000)) {
         return false
     } else {
         return true
@@ -395,7 +393,8 @@ function watering_by_keywords() {
             }
         }
         if (idContains("group_list").exists()) {
-            is_theEnd = idContains("group_list").scrollDown()
+            var group_listlength = idContains("group_list").find().length
+            is_theEnd = !idContains("group_list").find()[group_listlength - 1].scrollDown()
             sleep(1000)
         }
         sleep(500)
@@ -451,7 +450,8 @@ function Read_group_lists() {
                 logUtils.logInfo("当前页面(我加入的)");
                 logUtils.warnInfo("检测中...请勿操作手机");
                 floaty_show_text("检测中...请勿操作手机")
-                idContains("group_list").findOne().children().forEach(child => {
+                var group_listlength = idContains("group_list").find().length
+                idContains("group_list").find()[group_listlength - 1].children().forEach(child => {
                     var target = child.findOne(id("group_title"));
                     if (target) {
                         if (target.text() != "") {
@@ -564,6 +564,7 @@ function watering_Ex(group_name, waterNum) {
     var complete = false
     var cooperate_energy;
     var My_energy
+    let countj=0
     while (!complete) {
         if (idContains("tv_title").textContains(group_name).exists()) {
             //logUtils.infoLog('群名：'+group_name);
@@ -574,13 +575,30 @@ function watering_Ex(group_name, waterNum) {
                     logUtils.warnInfo('正在进入公益树...');
                     floaty_show_text("正在进入公益树...")
                 }
-            } /* else {
-                if (className("android.widget.ImageView").desc("群聊信息").exists()) {
+            }  else {
+                if(countj>3){
+                    while (!className("android.widget.TextView").text("群设置").exists()) {
+                        if (className("android.widget.ImageView").desc("群聊信息").exists()) {
+                            try { desc("群聊信息").click() } catch (e) { }
+                        }
+                        sleep(500)
+                    }
+                    while (!idContains("tv_title").textContains(group_name).exists()) {
+                        if (className("android.widget.ImageButton").desc("返回").exists()) {
+                            className("android.widget.ImageButton").desc("返回").click()
+                        }
+                        sleep(1000)
+                    }
+                    countj=0
+                }else{
+                    countj++
+                }
+                /* if (className("android.widget.ImageView").desc("群聊信息").exists()) {
                     logUtils.errorInfo('群名：' + group_name + '没有公益树');
                     floaty_show_text('群名：' + group_name + '没有公益树')
                     complete = true
-                }
-            } */
+                } */
+            } 
         }
         if (text('总排行榜').exists()) {
             cooperate_energy = get_cooperate_energy()
@@ -651,6 +669,7 @@ function watering(group_name, waterNum) {
     var complete = false
     var cooperate_energy;
     var My_energy
+    let countj=0
     while (!complete) {
         if (idContains("tv_title").textContains(group_name).exists()) {
             //logUtils.infoLog('群名：'+group_name);
@@ -661,13 +680,30 @@ function watering(group_name, waterNum) {
                     logUtils.warnInfo('正在进入公益树...');
                     floaty_show_text("正在进入公益树...")
                 }
-            } /* else {
-                if (className("android.widget.ImageView").desc("群聊信息").exists()) {
+            } else {
+                if(countj>3){
+                    while (!className("android.widget.TextView").text("群设置").exists()) {
+                        if (className("android.widget.ImageView").desc("群聊信息").exists()) {
+                            try { desc("群聊信息").click() } catch (e) { }
+                        }
+                        sleep(500)
+                    }
+                    while (!idContains("tv_title").textContains(group_name).exists()) {
+                        if (className("android.widget.ImageButton").desc("返回").exists()) {
+                            className("android.widget.ImageButton").desc("返回").click()
+                        }
+                        sleep(1000)
+                    }
+                    countj=0
+                }else{
+                    countj++
+                }
+/*                 if (className("android.widget.ImageView").desc("群聊信息").exists()) {
                     logUtils.errorInfo('群名：' + group_name + '没有公益树');
                     floaty_show_text('群名：' + group_name + '没有公益树')
                     complete = true
-                }
-            } */
+                } */
+            }
         }
         if (text('总排行榜').exists()) {
             cooperate_energy = get_cooperate_energy()
@@ -774,6 +810,7 @@ function continue_watering(group_name, waterNum) {
     var complete = false
     var cooperate_energy;
     var My_energy
+    let countj=0
     while (!complete) {
         if (idContains("tv_title").textContains(group_name).exists()) {
             //logUtils.infoLog('群名：'+group_name);
@@ -784,13 +821,30 @@ function continue_watering(group_name, waterNum) {
                     logUtils.warnInfo('正在进入公益树...');
                     floaty_show_text("正在进入公益树...")
                 }
-            }/*  else {
-                if (className("android.widget.ImageView").desc("群聊信息").exists()) {
+            } else {
+                if(countj>3){
+                    while (!className("android.widget.TextView").text("群设置").exists()) {
+                        if (className("android.widget.ImageView").desc("群聊信息").exists()) {
+                            try { desc("群聊信息").click() } catch (e) { }
+                        }
+                        sleep(500)
+                    }
+                    while (!idContains("tv_title").textContains(group_name).exists()) {
+                        if (className("android.widget.ImageButton").desc("返回").exists()) {
+                            className("android.widget.ImageButton").desc("返回").click()
+                        }
+                        sleep(1000)
+                    }
+                    countj=0
+                }else{
+                    countj++
+                }
+/*                 if (className("android.widget.ImageView").desc("群聊信息").exists()) {
                     logUtils.errorInfo('群名：' + group_name + '没有公益树');
                     floaty_show_text('群名：' + group_name + '没有公益树')
                     complete = true
-                }
-            } */
+                } */
+            }
         }
         if (text('总排行榜').exists()) {
             cooperate_energy = get_cooperate_energy()
@@ -965,13 +1019,13 @@ function open_sticky() {
 }
 
 function search_groupsAndclick(group_name) {
-    let complete=false
+    let complete = false
     while (!complete) {
         if (textContains(group_name).exists()) {
-            if (text("未搜索到相关结果").exists() ) {
-                logUtils.logInfo(group_name+'未搜索到相关结果')
+            if (text("未搜索到相关结果").exists()) {
+                logUtils.logInfo(group_name + '未搜索到相关结果')
                 complete = true
-            }else if(text("我的群组").exists()){
+            } else if (text("我的群组").exists()) {
                 sleep(200)
                 try {
                     //var groupText = idContains("tv_friend_name").findOne(1000)
@@ -986,16 +1040,16 @@ function search_groupsAndclick(group_name) {
                 } catch (e) { }
             }
         } else {
-                var search_groups = idContains("search_src_text").findOnce()
-                if (search_groups) {
-                    logUtils.debugInfo("开始查找群：" + group_name)
-                    search_groups.setText(group_name)
-                }
-                if (idContains("view_search").exists()) {
-                    try { idContains("view_search").findOnce().click() } catch (e) { }
-                }          
+            var search_groups = idContains("search_src_text").findOnce()
+            if (search_groups) {
+                logUtils.debugInfo("开始查找群：" + group_name)
+                search_groups.setText(group_name)
+            }
+            if (idContains("view_search").exists()) {
+                try { idContains("view_search").findOnce().click() } catch (e) { }
+            }
         }
-        if(!idContains("search_src_text").exists() && text("我加入的").exists()){
+        if (!idContains("search_src_text").exists() && text("我加入的").exists()) {
             if (idContains("view_search").exists()) {
                 try { idContains("view_search").findOnce().click() } catch (e) { }
             }
@@ -1019,15 +1073,15 @@ function push_watering_today() {
     let watering_data = AntForestDao.pageCollectInfo(push_query)
     let water_summary = AntForestDao.getCollectSummary(push_query)
     let water_detail = []
-    if (parseInt(watering_data.total) > 0) {
+    if (parseInt(water_summary.totalWater) > 0) {
         for (var i = 0; i < watering_data.result.length; i++) {
             let group_watering_data = { '群名': watering_data.result[i].friendName, '浇水数量': watering_data.result[i].waterEnergy + "g" }
             water_detail.push(group_watering_data)
         }
-        let push_data = { '总浇水次数': parseInt(watering_data.total), '总浇水': parseInt(water_summary.totalWater) + "g", '浇水详情': water_detail }
+        let push_data = { '总浇水次数': parseInt(water_detail.length), '总浇水': parseInt(water_summary.totalWater) + "g", '浇水详情': water_detail }
         let token = config.pushplus_token.replace(/ /g, '')
         let title = dateFormat(new Date(), 'yyyy-MM-dd') + '  钉钉合种浇水'
-        let url = 'http://pushplus.hxtrip.com/send'  //http://www.pushplus.plus/send
+        let url = 'http://www.pushplus.plus/send'  //http://www.pushplus.plus/send
         let data = {
             "token": token,
             "title": title,

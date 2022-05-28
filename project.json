@@ -1,10 +1,24 @@
 {
-    "name": "自动化v1.1.4",
-    "main": "main.js",
-    "ignore": [
-        "build"
-    ],
-    "versionName": "1.1.4",
-    "packageName": "com.Script.auto.assistant",
-    "versionCode": 1
+  "assets": [],
+  "build": {},
+  "encryptLevel": 3,
+  "useFeatures": [],
+  "icon": "res/icon.png",
+  "launchConfig": {
+    "displaySplash": true,
+    "hideLogs": false,
+    "splashLayoutXml": "splash.xml",
+    "splashText": "",
+    "stableMode": false
+  },
+  "main": "main.js",
+  "name": "森林梦",
+  "optimization": {
+    "removeOpenCv": false,
+    "unusedResources": false
+  },
+  "packageName": "com.AntforestDreamPro.assistant",
+  "scripts": {},
+  "versionCode": 1,
+  "versionName": "1.5.28.1"
 }

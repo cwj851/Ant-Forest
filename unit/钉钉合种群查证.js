@@ -47,11 +47,11 @@ function checkLicenceAndSave() {
       sleep(100)
     }
   }
-  files.ensureDir('./合种证书/')
-  var path = './合种证书/' + GName + '合种证书.txt'
+  files.ensureDir('/sdcard/森林梦/合种证书/')
+  var path = '/sdcard/森林梦/合种证书/' + GName + '合种证书.txt'
   var file = open(path, 'w')
-  let summaryE=EnergySum(palntmsgList)
-  file.writeline('合种总能量：'+summaryE+',合种明细如下：')
+  let summaryE = EnergySum(palntmsgList)
+  file.writeline('合种总能量：' + summaryE + '，证书数量：' + palntmsgList.length+'，合种明细如下：')
   for (var i = 0; i < palntmsgList.length; i++) {
     log(JSON.stringify(palntmsgList[i]))
     file.writeline(JSON.stringify(palntmsgList[i]))
@@ -88,8 +88,8 @@ function checkLicenceAndSave2() {
     sleep(100)
   });
   
-  files.ensureDir('./合种证书/')
-  var path = './合种证书/' + GName + '合种证书.txt'
+  files.ensureDir('/sdcard/森林梦/合种证书/')
+  var path = '/sdcard/森林梦/合种证书/' + GName + '合种证书.txt'
   var file = open(path, 'w')
   let summaryE=EnergySum(palntmsgList)
   file.writeline('合种总能量：'+summaryE+',合种明细如下：')
@@ -177,9 +177,10 @@ let running = true
  * 主程序
  */
 function main() {
-  let start = new Date()
+  //let start = new Date()
   checkLicenceAndSave()
-  toastLog('提取完毕，耗时' + (new Date() - start) + 'ms')
+  //toastLog('提取完毕，耗时' + (new Date() - start) + 'ms')
+  toastLog('提取完毕，查证结果保存在/sdcard/森林梦/合种证书')
 }
 
 // 获取状态栏高度
@@ -202,17 +203,31 @@ ui.run(function () {
 // 点击提取
 clickButtonWindow.captureAndOcr.click(function () {
   if (isAchievement()) {
-    ui.run(function () {
-      clickButtonWindow.setPosition(device.width, device.height)
-    })
-    setTimeout(() => {
-      threads.start(function () {
-        main()
-        ui.run(function () {
-          clickButtonWindow.setPosition(device.width / 2 - ~~(clickButtonWindow.getWidth() / 2), device.height * 0.65)
-        })
-      })
-    }, 500)
+    dialogs.rawInput("请输入查证截止日期(日期格式：YYYY.MM.DD)")
+    .then(dateText => {
+        if (!dateText) {
+          toastLog('未输入查证截止日期！')
+            return;
+        }
+        let DateRes = dateText.match(new RegExp(/((^((1[8-9]\d{2})|([2-9]\d{3}))(.)(10|12|0?[13578])(.)(3[01]|[12][0-9]|0?[1-9])$)|(^((1[8-9]\d{2})|([2-9]\d{3}))(.)(11|0?[469])(.)(30|[12][0-9]|0?[1-9])$)|(^((1[8-9]\d{2})|([2-9]\d{3}))(.)(0?2)(.)(2[0-8]|1[0-9]|0?[1-9])$)|(^([2468][048]00)(.)(0?2)(.)(29)$)|(^([3579][26]00)(.)(0?2)(.)(29)$)|(^([1][89][0][48])(.)(0?2)(.)(29)$)|(^([2-9][0-9][0][48])(.)(0?2)(.)(29)$)|(^([1][89][2468][048])(.)(0?2)(.)(29)$)|(^([2-9][0-9][2468][048])(.)(0?2)(.)(29)$)|(^([1][89][13579][26])(.)(0?2)(.)(29)$)|(^([2-9][0-9][13579][26])(.)(0?2)(.)(29)$))/));
+        Deadline = DateRes ? DateRes[0] : '';
+        if (Deadline != '') {
+          ui.run(function () {
+            clickButtonWindow.setPosition(device.width, device.height)
+          })
+          setTimeout(() => {
+            threads.start(function () {
+              main()
+              ui.run(function () {
+                clickButtonWindow.setPosition(device.width / 2 - ~~(clickButtonWindow.getWidth() / 2), device.height * 0.65)
+              })
+            })
+          }, 500)
+        } else {
+            toastLog('查证截止日期格式不正确！')
+            return;
+        }
+    }) 
   } else {
     toastLog('请在合种成就页面在点击查证')
   }

@@ -1,10 +1,3 @@
-/*
- * @Author: TonyJiangWJ
- * @Date: 2019-12-09 20:42:08
- * @Last Modified by: cwj851
- * @Last Modified time: 2021-01-08 00:39:41
- * @Description: 
- */
 let currentEngine = engines.myEngine().getSource() + ''
 let isRunningMode = currentEngine.endsWith('/config.js') && typeof module === 'undefined'
 let is_pro = !!Object.prototype.toString.call(com.stardust.autojs.core.timing.TimedTask.Companion).match(/Java(Class|Object)/)
@@ -15,13 +8,14 @@ let default_config = {
   alipay_lock_password: '',
   color_offset: 20,
    // 切号设置参数
-  version_choose: 'a',
+   accounts:[],
+  version_choose: 'b',
   enter_forest: false,                
   look_sport: false,   
   send_tool: false,
   send_tool_friendId:'',
-  accoun_change_time: 30,
-  auto_delay:true,
+  accoun_change_time: 10,
+  auto_delay:false,
   auto_Energy_rain:false,
   cycleTimes:1,
   collect_self:false,
@@ -29,12 +23,13 @@ let default_config = {
   watering_friendId: '',
   watering_friend_num: '66',
   watering_friend_times: '3',
+  changeBack:true,
   //钉钉浇水设置参数
   DdGroups_list:[],
   DdGroups_list_Ex:[],
   DdWateringGroups:[],
   DdWateringGroupsEx:[],
-  water_pattern:'1',
+  water_pattern:'2',
   water_keywords: '',                
   skip_keywords: '', 
   is_watering:true,
@@ -45,7 +40,7 @@ let default_config = {
   MaxContinue:false,
   pushplus:true,
   pushplus_token: '',
-  change_bandage:true,
+  change_bandage:false,
   Master_Account: '',
   change_water_Num: 1000,
   intent_or_click:'b',
@@ -54,7 +49,10 @@ let default_config = {
   //步数修改设置
   step_min: 18000,
   step_max: 21000,
+  Sportpushplus:false,
   huami_account_lists: [],
+  DailyOnly:false,
+  SumOnly:false,
   //Study设置参数
   choose: 'c',                 //文字识别(OCR)类型选择  华为OCR接口,需要填入以下关于华为的内容|第三方OCR插件,需要安装第三方插件|内置Paddle OCR->推荐|百度OCR接口,需要填入以下关于百度的内容
   meizhou_txt: true,           //每周答题(建议手动答题)
@@ -92,7 +90,7 @@ let default_config = {
   not_setup_auto_start: true,
   disable_all_auto_start: true,
   min_floaty_x: 150,
-  min_floaty_y: 20,
+  min_floaty_y: 70,
   min_floaty_color: '#ff0000',
   min_floaty_text_size: 12,
   is_cycle: false,
@@ -127,7 +125,7 @@ let default_config = {
   cutAndSaveCountdown: false,
   // 保存好友页面可收取和可帮助图片
   cutAndSaveTreeCollect: false,
-  auto_lock: device.sdkInt >= 28,
+  auto_lock: false,
   lock_x: 150,
   lock_y: 970,
   // 是否根据当前锁屏状态来设置屏幕亮度，当锁屏状态下启动时 设置为最低亮度，结束后设置成自动亮度
@@ -308,7 +306,9 @@ let default_config = {
   clear_webview_cache: false,
   // 更新后需要强制执行的标记
   updated_temp_flag_13549: true,
-  updated_temp_flag_13510: true
+  updated_temp_flag_13510: true,
+    // 配置界面webview打印日志
+    webview_loging: false
 }
 // 自动生成的配置数据 
 let auto_generate_config = {
@@ -321,7 +321,7 @@ let auto_generate_config = {
 let no_cache_configs = ['release_access_token']
 let securityFields = ['password', 'alipay_lock_password']
 let CONFIG_STORAGE_NAME = 'Script_auto_config_fork_version'
-let PROJECT_NAME = '脚本自动化'
+let PROJECT_NAME = '森林梦'
 let config = {}
 let storageConfig = storages.create(CONFIG_STORAGE_NAME)
 let AesUtil = require('./lib/AesUtil.js')
@@ -406,7 +406,7 @@ if (!isRunningMode) {
   }
   module.exports = function (__runtime__, scope) {
     if (typeof scope.config_instance === 'undefined') {
-      console.verbose('config未实例化，准备实例化config.js')
+      //console.verbose('config未实例化，准备实例化config.js')
       config.getReactiveTime = () => {
         let reactiveTime = config.reactive_time
         if (isNaN(reactiveTime)) {
@@ -513,4 +513,18 @@ function getCurrentWorkPath() {
   if (paths.length > 0) {
     return currentPath
   }
+}
+
+function getConfigValue(configValue, key) {
+  if (securityFields.indexOf(key) > -1) {
+    try {
+      configValue = AesUtil.decrypt(configValue, aesKey) || configValue
+      if (objFields.indexOf(key) > -1) {
+        configValue = JSON.parse(configValue)
+      }
+    } catch (e) {
+      console.error('解密字段失败：', key)
+    }
+  }
+  return configValue
 }

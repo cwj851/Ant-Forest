@@ -104,7 +104,7 @@ const CollectSummary = {
           </van-col>
         </van-row>
       </tip-block>
-      <tip-block>总浇水次数：{{query.total}}  总浇水：{{totalWater}}g</tip-block>
+      <tip-block>总浇水次数：{{friendCollectList.length}}  总浇水：{{totalWater}}g</tip-block>
       <van-cell v-for="(item,idx) in friendCollectList"
         :key="item.friendName+item.createTime"
         class="van-clearfix"
