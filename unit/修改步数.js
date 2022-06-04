@@ -5,8 +5,7 @@ try {
   importClass("okhttp3.FormBody")
   importClass("okhttp3.Request")
   importClass("okhttp3.OkHttpClient")
-} catch (e) {
-}
+} catch (e) {}
 
 
 var { default_config, config, storage_name: _storage_name } = require('../config.js')(runtime, global)

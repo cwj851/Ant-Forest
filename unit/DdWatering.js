@@ -169,7 +169,7 @@ function clickBack() {
         className("android.widget.ImageButton").desc("返回").click()
     }
     if (idContains("img_back").desc("返回").exists()) {
-        idContains("img_back").desc("返回").findOnce().parent().click()
+        idContains("img_back").desc("返回").findOne().parent().click()
     }
     closePage()
 }
@@ -403,12 +403,12 @@ function watering_by_keywords() {
 
 function group_lists_manager() {
     while (!idContains("tv_title").className("android.widget.TextView").text("我的群组").exists()) {
-        var txlTarget = idContains("home_bottom_tab_text_highlight").text('通讯录').findOnce()
+        var txlTarget = idContains("home_bottom_tab_text_highlight").text('通讯录').findOne()
         if (txlTarget) { txlTarget.parent().parent().click() }
         sleep(500)
     }
     while (!idContains("tv_text").className("android.widget.TextView").text("我加入的").exists()) {
-        var MyGroupsTarget = idContains("tv_title").className("android.widget.TextView").text("我的群组").findOnce()
+        var MyGroupsTarget = idContains("tv_title").className("android.widget.TextView").text("我的群组").findOne()
         if (MyGroupsTarget) { MyGroupsTarget.parent().parent().click() }
         sleep(500)
     }
@@ -417,7 +417,7 @@ function group_lists_manager() {
 function back_to_group_lists() {
     while (true) {
         if (idContains("tv_text").className("android.widget.TextView").text("我加入的").exists()) {
-            var MyGroups = idContains("tv_text").className("android.widget.TextView").text("我加入的").findOnce().parent().parent().parent()
+            var MyGroups = idContains("tv_text").className("android.widget.TextView").text("我加入的").findOne().parent().parent().parent()
             if (MyGroups.selected()) {
                 break
             } else {
@@ -445,7 +445,7 @@ function Read_group_lists() {
     group_lists = [];
     while (true) {
         if (idContains("tv_text").className("android.widget.TextView").text("我加入的").exists()) {
-            var MyGroups = idContains("tv_text").className("android.widget.TextView").text("我加入的").findOnce().parent().parent().parent()
+            var MyGroups = idContains("tv_text").className("android.widget.TextView").text("我加入的").findOne().parent().parent().parent()
             if (MyGroups.selected()) {
                 logUtils.logInfo("当前页面(我加入的)");
                 logUtils.warnInfo("检测中...请勿操作手机");
@@ -470,7 +470,7 @@ function Read_group_lists() {
 }
 
 function get_cooperate_energy() {
-    var plantTrees = className("android.view.View").text("种树").findOnce()
+    var plantTrees = className("android.view.View").text("种树").findOne(1000)
     if (plantTrees) {
         return plantTrees.parent().child(0).text()
     }
@@ -478,7 +478,7 @@ function get_cooperate_energy() {
 }
 
 function get_My_energy() {
-    var gtext = className("android.view.View").text("g").findOnce().parent().parent()
+    var gtext = className("android.view.View").text("g").findOne(1000).parent().parent()
     if (gtext) {
         var tiptext = gtext.child(1).child(0).text()
         return getValue('你有', '，', tiptext)
@@ -569,7 +569,7 @@ function watering_Ex(group_name, waterNum) {
         if (idContains("tv_title").textContains(group_name).exists()) {
             //logUtils.infoLog('群名：'+group_name);
             if (idContains("title").text("公益树").exists()) {
-                var gysTarget = idContains("title").text("公益树").findOnce().parent().parent()
+                var gysTarget = idContains("title").text("公益树").findOne().parent().parent()
                 if (gysTarget) {
                     gysTarget.click()
                     logUtils.warnInfo('正在进入公益树...');
@@ -630,7 +630,7 @@ function watering_Ex(group_name, waterNum) {
                                 Etext.setText(waterNum)
                             }
                             waterGroupcount++
-                            var waterTarget = text("浇水").findOnce().bounds()
+                            var waterTarget = text("浇水").findOne().bounds()
                             sleep(500)
                             var Etext2 = gtext.findOne(className("android.widget.EditText")).text()
                             logUtils.infoLog('本次浇水：' + Etext2 + 'g');
@@ -648,7 +648,7 @@ function watering_Ex(group_name, waterNum) {
                     if (WaterPoint) { click(WaterPoint.centerX, WaterPoint.centerY) }
                 }
                 if (className("android.view.View").text("知道了").exists()) {
-                    var ikonwTarget = text("知道了").findOnce().bounds()
+                    var ikonwTarget = text("知道了").findOne().bounds()
                     sleep(500)
                     logUtils.errorInfo('已浇过水，执行跳过...');
                     floaty_show_text('已浇过水，执行跳过...')
@@ -674,7 +674,7 @@ function watering(group_name, waterNum) {
         if (idContains("tv_title").textContains(group_name).exists()) {
             //logUtils.infoLog('群名：'+group_name);
             if (idContains("title").text("公益树").exists()) {
-                var gysTarget = idContains("title").text("公益树").findOnce().parent().parent()
+                var gysTarget = idContains("title").text("公益树").findOne().parent().parent()
                 if (gysTarget) {
                     gysTarget.click()
                     logUtils.warnInfo('正在进入公益树...');
@@ -746,7 +746,7 @@ function watering(group_name, waterNum) {
                                         Etext.setText(waterNum)
                                     }
                                     waterGroupcount++
-                                    var waterTarget = text("浇水").findOnce().bounds()
+                                    var waterTarget = text("浇水").findOne().bounds()
                                     sleep(500)
                                     var Etext2 = gtext.findOne(className("android.widget.EditText")).text()
                                     logUtils.infoLog('本次浇水：' + Etext2 + 'g');
@@ -770,7 +770,7 @@ function watering(group_name, waterNum) {
                                     Etext.setText(waterNum)
                                 }
                                 waterGroupcount++
-                                var waterTarget = text("浇水").findOnce().bounds()
+                                var waterTarget = text("浇水").findOne().bounds()
                                 sleep(500)
                                 var Etext2 = gtext.findOne(className("android.widget.EditText")).text()
                                 logUtils.infoLog('本次浇水：' + Etext2 + 'g');
@@ -789,7 +789,7 @@ function watering(group_name, waterNum) {
                     if (WaterPoint) { click(WaterPoint.centerX, WaterPoint.centerY) }
                 }
                 if (className("android.view.View").text("知道了").exists()) {
-                    var ikonwTarget = text("知道了").findOnce().bounds()
+                    var ikonwTarget = text("知道了").findOne().bounds()
                     sleep(500)
                     logUtils.errorInfo('已浇过水，执行跳过...');
                     floaty_show_text('已浇过水，执行跳过...')
@@ -815,7 +815,7 @@ function continue_watering(group_name, waterNum) {
         if (idContains("tv_title").textContains(group_name).exists()) {
             //logUtils.infoLog('群名：'+group_name);
             if (idContains("title").text("公益树").exists()) {
-                var gysTarget = idContains("title").text("公益树").findOnce().parent().parent()
+                var gysTarget = idContains("title").text("公益树").findOne().parent().parent()
                 if (gysTarget) {
                     gysTarget.click()
                     logUtils.warnInfo('正在进入公益树...');
@@ -888,7 +888,7 @@ function continue_watering(group_name, waterNum) {
                                         Etext.setText(waterNum)
                                     }
                                     waterGroupcount++
-                                    var waterTarget = text("浇水").findOnce().bounds()
+                                    var waterTarget = text("浇水").findOne().bounds()
                                     sleep(500)
                                     var Etext2 = gtext.findOne(className("android.widget.EditText")).text()
                                     logUtils.infoLog('本次浇水：' + Etext2 + 'g');
@@ -911,7 +911,7 @@ function continue_watering(group_name, waterNum) {
                                     Etext.setText(waterNum)
                                 }
                                 waterGroupcount++
-                                var waterTarget = text("浇水").findOnce().bounds()
+                                var waterTarget = text("浇水").findOne().bounds()
                                 sleep(500)
                                 var Etext2 = gtext.findOne(className("android.widget.EditText")).text()
                                 logUtils.infoLog('本次浇水：' + Etext2 + 'g');
@@ -930,7 +930,7 @@ function continue_watering(group_name, waterNum) {
                     if (WaterPoint) { click(WaterPoint.centerX, WaterPoint.centerY) }
                 }
                 if (className("android.view.View").text("知道了").exists()) {
-                    var ikonwTarget = text("知道了").findOnce().bounds()
+                    var ikonwTarget = text("知道了").findOne().bounds()
                     sleep(500)
                     logUtils.errorInfo('已浇过水，执行跳过...');
                     floaty_show_text('已浇过水，执行跳过...')
@@ -960,7 +960,7 @@ function open_No_interruptions() {
     let No_interruptions = false
     while (className("android.widget.TextView").text("群设置").exists()) {
         if (idContains("menu_item_title").className("android.widget.TextView").text("消息免打扰").exists()) {
-            var no_inter_target = idContains("menu_item_title").text("消息免打扰").findOnce().parent()
+            var no_inter_target = idContains("menu_item_title").text("消息免打扰").findOne().parent()
             if (no_inter_target) {
                 var no_inter_button = no_inter_target.findOne(idContains("menu_item_toggle"))
                 if (no_inter_button) {
@@ -994,7 +994,7 @@ function open_sticky() {
     let sticky = false
     while (className("android.widget.TextView").text("群设置").exists()) {
         if (idContains("menu_item_title").className("android.widget.TextView").text("聊天置顶").exists()) {
-            var sticky_target = idContains("menu_item_title").text("聊天置顶").findOnce().parent()
+            var sticky_target = idContains("menu_item_title").text("聊天置顶").findOne().parent()
             if (sticky_target) {
                 var sticky_button = sticky_target.findOne(idContains("menu_item_toggle"))
                 if (sticky_button) {
@@ -1040,18 +1040,18 @@ function search_groupsAndclick(group_name) {
                 } catch (e) { }
             }
         } else {
-            var search_groups = idContains("search_src_text").findOnce()
+            var search_groups = idContains("search_src_text").findOne(1000)
             if (search_groups) {
                 logUtils.debugInfo("开始查找群：" + group_name)
                 search_groups.setText(group_name)
             }
             if (idContains("view_search").exists()) {
-                try { idContains("view_search").findOnce().click() } catch (e) { }
+                try { idContains("view_search").findOne(1000).click() } catch (e) { }
             }
         }
         if (!idContains("search_src_text").exists() && text("我加入的").exists()) {
             if (idContains("view_search").exists()) {
-                try { idContains("view_search").findOnce().click() } catch (e) { }
+                try { idContains("view_search").findOne(1000).click() } catch (e) { }
             }
         }
         sleep(500)
@@ -1342,7 +1342,7 @@ function bandage_Alipay() {
 
         if (idContains("tv_title").exists()) {
             if (idContains("title").text("公益树").exists()) {
-                var gysTarget = idContains("title").text("公益树").findOnce().parent().parent()
+                var gysTarget = idContains("title").text("公益树").findOne().parent().parent()
                 if (gysTarget) {
                     gysTarget.click()
                     logUtils.warnInfo('正在进入公益树...')
@@ -1376,14 +1376,14 @@ function bandage_Alipay() {
                     if (textContains("成功绑定").exists()) {
                         logUtils.logInfo("绑定成功")
                         floaty_show_text("绑定成功")
-                        className("android.widget.Button").text("知道了").findOnce().click()
+                        className("android.widget.Button").text("知道了").findOne().click()
                         return true
                     }
                     if (textContains("钱包").exists()) {
                         logUtils.logInfo("绑定钱包,停止运行，请先手动解绑！")
                         floaty_show_text("绑定钱包,停止运行，请先手动解绑！")
                         toast("绑定钱包,停止运行，请先手动解绑！")
-                        className("android.widget.Button").text("知道了").findOnce().click()
+                        className("android.widget.Button").text("知道了").findOne().click()
                         return false
                     }
                     complete = true

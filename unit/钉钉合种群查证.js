@@ -16,8 +16,11 @@ if (runningEngines.length > 1) {
 //这是识别证书函数
 function checkLicenceAndSave() {
   let palntmsgList = []
+  let GetLicenceNum=0
   let GName = getGroupName()
-  let STarget=className("android.view.View").scrollable(true).findOne().children()
+  let Target = className("android.view.View").textMatches("环保证书.*").findOne(1000)
+  let STarget=Target.parent().child(1).children()
+  //let STarget=className("android.view.View").scrollable(true).findOne().children()
   for (var j = 0; j < STarget.length; j++) {
     {
       STarget[j].child(0).child(1).click()
@@ -37,6 +40,7 @@ function checkLicenceAndSave() {
         PlantName = DateTarget.parent().child(4).text()
       }
       let GetLicence = isGetLicence()
+      if(GetLicence){GetLicenceNum++}
       let plantMsg = { "合种日期": PlantDate, "合种编号": PlantNum, "合种树名": PlantName, "是否领证": GetLicence }
       log(JSON.stringify(plantMsg))
       palntmsgList.push(plantMsg)
@@ -51,54 +55,15 @@ function checkLicenceAndSave() {
   var path = '/sdcard/森林梦/合种证书/' + GName + '合种证书.txt'
   var file = open(path, 'w')
   let summaryE = EnergySum(palntmsgList)
-  file.writeline('合种总能量：' + summaryE + '，证书数量：' + palntmsgList.length+'，合种明细如下：')
+  file.writeline('合种总能量：' + summaryE + '，查询证书数量：' + palntmsgList.length+ '，获得证书数量：' + GetLicenceNum+'，合种明细如下：')
+  console.error('合种总能量：' + summaryE + '，查询证书数量：' + palntmsgList.length+ '，获得证书数量：' + GetLicenceNum)
   for (var i = 0; i < palntmsgList.length; i++) {
-    log(JSON.stringify(palntmsgList[i]))
+    //log(JSON.stringify(palntmsgList[i]))
     file.writeline(JSON.stringify(palntmsgList[i]))
   }
   file.close()
 }
 
-function checkLicenceAndSave2() {
-  let palntmsgList = []
-  let GName = getGroupName()
-  className("android.view.View").scrollable(true).findOne().children().forEach(function (child) {
-    child.child(0).child(1).click()
-    while (!text('保存图片').exists()) { }
-    sleep(100)
-    let PlantNum
-    let PlantDate
-    let PlantName
-
-    let PlantTarget = textMatches('[A-Z]{3,5}[0-9]{11}').findOne(1000)
-    if (PlantTarget) {
-      PlantNum = PlantTarget.text()
-    }
-    let DateTarget = textMatches(/^(\d{1,4})(.|\/)(\d{1,2})\2(\d{1,2})$/).findOnce()
-    if (DateTarget) {
-      PlantDate = DateTarget.text()
-      PlantName = DateTarget.parent().child(4).text()
-    }
-    let GetLicence = isGetLicence()
-    let plantMsg = { "合种日期": PlantDate, "合种编号": PlantNum, "合种树名": PlantName, "是否领证": GetLicence }
-    log(JSON.stringify(plantMsg))
-    palntmsgList.push(plantMsg)
-    CloseLicence()
-    if(OutOfDate(plantMsg.合种日期,Deadline)){return}
-    sleep(100)
-  });
-  
-  files.ensureDir('/sdcard/森林梦/合种证书/')
-  var path = '/sdcard/森林梦/合种证书/' + GName + '合种证书.txt'
-  var file = open(path, 'w')
-  let summaryE=EnergySum(palntmsgList)
-  file.writeline('合种总能量：'+summaryE+',合种明细如下：')
-  for (var i = 0; i < palntmsgList.length; i++) {
-    log(JSON.stringify(palntmsgList[i]))
-    file.writeline(JSON.stringify(palntmsgList[i]))
-  }
-  file.close()
-}
 
 function getGroupName() {
   let groupName = ''

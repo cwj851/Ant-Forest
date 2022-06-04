@@ -997,6 +997,8 @@ const SkipPackageConfig = {
       newHMuser: '',
       newHMpassword: '',
       showAddHMaccountDialog: false,
+      isEdit: false,
+      editIdx: '',
       configs: {
         step_min: 18000,
         step_max: 21000,
@@ -1011,6 +1013,7 @@ const SkipPackageConfig = {
       this.newHMuser = ''
       this.newHMpassword = ''
       this.showAddHMaccountDialog = true
+      this.isEdit = false
     },
     editAccount: function (idx) {
       let target = this.configs.huami_account_lists[idx]
@@ -1024,7 +1027,7 @@ const SkipPackageConfig = {
       if (this.isEdit) {
         this.doEditHMAccount()
       } else {
-        this.deleteHMaccount()
+        this.doaddHMaccount()
       }
     },
     doaddHMaccount: function () {

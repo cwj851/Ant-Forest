@@ -5,24 +5,6 @@ importClass(java.util.concurrent.CountDownLatch)
 importClass(java.util.concurrent.ThreadFactory)
 importClass(java.util.concurrent.Executors)
 importClass(com.stardust.autojs.core.graphics.ScriptCanvas)
-try {
-  importClass(com.stardust.autojs.core.accessibility.AccessibilityBridge.WindowFilter);
-  let bridge = runtime.accessibilityBridge;
-  let bridgeField = runtime.getClass().getDeclaredField("accessibilityBridge");
-  let configField = bridgeField.getType().getDeclaredField("mConfig");
-  configField.setAccessible(true);
-  configField.set(bridge, configField.getType().newInstance());
-  bridge.setWindowFilter(new JavaAdapter(AccessibilityBridge$WindowFilter, {
-      filter: function (info) {
-          return true;
-      }
-  }));
-} catch (e) { }
-/* var { default_config, config, storage_name: _storage_name } = require('../config.js')(runtime, global)
-let singletonRequire = require('../lib/SingletonRequirer.js')(runtime, global)
-require('../modules/init_if_needed.js')(runtime, global)
-let _commonFunctions = singletonRequire('CommonFunction')
-_commonFunctions.readyForAlipayWidgets() */
 
 let currentEngine = engines.myEngine()
 let runningEngines = engines.all()
@@ -61,10 +43,10 @@ if (!FloatyInstance.init()) {
   exit()
 }
 FloatyInstance.enableLog()
-/* if (!commonFunction.ensureAccessibilityEnabled()) {
+if (!commonFunction.ensureAccessibilityEnabled()) {
   errorInfo('获取无障碍权限失败')
   exit()
-} */
+}
 config.show_debug_log = true
 let runningQueueDispatcher = sRequire('RunningQueueDispatcher')
 commonFunction.autoSetUpBangOffset(true)
@@ -279,7 +261,7 @@ clickButtonWindow.delayClose.setOnTouchListener(new android.view.View.OnTouchLis
 function checkAndSendChance () {
   setDisplayText('正在校验是否存在 “更多好友”，请稍等')
   // 设置至少十秒的查找时间
-  let endDateForCheck = new Date().getTime() + 10 * 60
+  let endDateForCheck = new Date().getTime() + 10000 + (config.timeout_rain_find_friend || 3000)
   targetEndTime = endDateForCheck > targetEndTime ? endDateForCheck : targetEndTime
   let showMoreFriend = widgetUtils.widgetGetById('J_moreGrant', 1000)
   if (showMoreFriend && (targetSendName || config.send_chance_to_friend)) {
@@ -466,7 +448,10 @@ function exitAndClean () {
     debugInfo('发送消息，能量雨执行完毕', true)
     processShare.postInfo('能量雨执行完毕')
     if (args.executorSource) {
-      runningQueueDispatcher.doAddRunningTask({ source: args.executorSource })
+      let find = engines.all().filter(engine => engine.getSource() + '' == args.executorSource)
+      if (find.length > 1) {
+        runningQueueDispatcher.doAddRunningTask({ source: args.executorSource })
+      }
     }
   }
   isRunning = false

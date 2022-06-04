@@ -355,7 +355,7 @@ function main() {
                 }
                 if (config.auto_Energy_rain) { //能量雨
                     //openRainPage()
-                    let source = fileUtils.getCurrentWorkPath() + '/unit/能量雨收集Ex.js'
+                    let source = fileUtils.getCurrentWorkPath() + '/unit/能量雨收集.js'
                     runningQueueDispatcher.doAddRunningTask({ source: source })
                     let targetSendName = account[(i + 1) % account.length].accountName
                     logUtils.debugInfo(['赠送对象昵称为：{}', targetSendName])
@@ -426,7 +426,7 @@ function main() {
                             floaty_show_text("第一个账号再次校验能量雨机会")
                             logUtils.debugInfo("第一个账号再次校验能量雨机会");
                             //openRainPage()
-                            let source = fileUtils.getCurrentWorkPath() + '/unit/能量雨收集Ex.js'
+                            let source = fileUtils.getCurrentWorkPath() + '/unit/能量雨收集.js'
                             runningQueueDispatcher.doAddRunningTask({ source: source })
                             let targetSendName = account[1].accountName
                             logUtils.debugInfo(['赠送对象昵称为：{}', targetSendName])
