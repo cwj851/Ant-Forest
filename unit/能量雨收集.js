@@ -336,13 +336,13 @@ function checkAndStartCollect () {
     threadPool.execute(function () {
       writeLock.lock()
       try {
-        canStart = false
         ui.post(() => {
           clickButtonWindow.setPosition(-cvt(150), config.device_height * 0.65)
         })
         sleep(250)
         automator.clickCenter(startBtn)
         startTimestamp = new Date().getTime()
+        canStart = false
         ballsComplete.signal()
         changeButtonInfo()
         targetEndTime = targetEndTime > new Date().getTime() + 30000 ? targetEndTime : new Date().getTime() + 30000
@@ -532,7 +532,7 @@ function openRainPage () {
     data: 'alipays://platformapi/startapp?appId=20000067&url=' + encodeURIComponent('https://68687791.h5app.alipay.com/www/index.html'),
     packageName: config.package_name
   })
-  let confirm = widgetUtils.widgetGetOne(/^打开$/, 8000)
+  let confirm = widgetUtils.widgetGetOne(/^打开$/, 3000)
   if (confirm) {
     automator.clickCenter(confirm)
   }

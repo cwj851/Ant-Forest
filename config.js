@@ -14,7 +14,7 @@ let default_config = {
   look_sport: false,   
   send_tool: false,
   send_tool_friendId:'',
-  accoun_change_time: 10,
+  accoun_change_time: 5,
   auto_delay:false,
   auto_Energy_rain:false,
   cycleTimes:1,
