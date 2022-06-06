@@ -53,13 +53,13 @@ function start_app() {
     log("正在启动app...");
     if (!(launchApp("钉钉") || launch('com.alibaba.android.rimet'))) //
     {
-      log("找不到钉钉App!，请自己尝试打开");
+        log("找不到钉钉App!，请自己尝试打开");
         // return;
     }
     sleep(2000)
     //ZFB_SY()
     while (!packageName('com.alibaba.android.rimet').text("消息").exists()) {
-       log("正在等待加载出主页，如果一直加载此信息，请手动返回主页，或者无障碍服务可能出现BUG，请停止运行App重新给无障碍服务");
+        log("正在等待加载出主页，如果一直加载此信息，请手动返回主页，或者无障碍服务可能出现BUG，请停止运行App重新给无障碍服务");
         closeUpdata()
         clickBack()
         closePage()
@@ -68,6 +68,19 @@ function start_app() {
     }
     log("启动app成功！");
     sleep(1000);
+}
+
+function group_lists_manager() {
+    while (!idContains("tv_title").className("android.widget.TextView").text("我的群组").exists()) {
+        var txlTarget = idContains("home_bottom_tab_text_highlight").text('通讯录').findOne()
+        if (txlTarget) { txlTarget.parent().parent().click() }
+        sleep(500)
+    }
+    while (!idContains("tv_text").className("android.widget.TextView").text("我加入的").exists()) {
+        var MyGroupsTarget = idContains("tv_title").className("android.widget.TextView").text("我的群组").findOne()
+        if (MyGroupsTarget) { MyGroupsTarget.parent().parent().click() }
+        sleep(500)
+    }
 }
 
 function closeUpdata() {
@@ -94,7 +107,11 @@ function closePage() {
 
 console.show()
 start_app()
-mine_group()
+if (config.intent_or_click == 'a') {
+    group_lists_manager()
+} else if (config.intent_or_click == 'b') {
+    mine_group()
+}
 Read_group_lists_by_scroll()
 console.log('====================')
 console.warn('提取完毕！共提取' + group_lists.length + '个')
