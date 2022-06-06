@@ -177,6 +177,7 @@ function clickBack() {
 function closePage() {
     if (idContains("close_layout").desc("关闭").exists()) {
         idContains("close_layout").desc("关闭").click()
+        sleep(200)
     }
 }
 
@@ -603,9 +604,9 @@ function watering_Ex(group_name, waterNum) {
         if (text('总排行榜').exists()) {
             cooperate_energy = get_cooperate_energy()
             var WaterPoint = checkAndClickWater()
-            //sleep(200)
             if (WaterPoint) {
                 click(WaterPoint.centerX, WaterPoint.centerY)
+                sleep(500)
             }
             while (true) {
                 if (text("我知道了").exists() && text("继续浇水").exists()) {
@@ -635,17 +636,21 @@ function watering_Ex(group_name, waterNum) {
                             var Etext2 = gtext.findOne(className("android.widget.EditText")).text()
                             logUtils.infoLog('本次浇水：' + Etext2 + 'g');
                             floaty_show_text('本次浇水：' + Etext2 + 'g')
+                            complete = true
                             watercount += parseInt(Etext2);
                             click(waterTarget.centerX(), waterTarget.centerY())
+                            sleep(200)
                             AntForestDao.saveFriendCollect(group_name, cooperate_energy, My_energy, parseInt(Etext2))
                             closePage()
-                            complete = true
                             break
                         }
                     }
                 } else {
                     WaterPoint = checkAndClickWater()
-                    if (WaterPoint) { click(WaterPoint.centerX, WaterPoint.centerY) }
+                    if (WaterPoint) { 
+                        click(WaterPoint.centerX, WaterPoint.centerY) 
+                        sleep(500)
+                    }
                 }
                 if (className("android.view.View").text("知道了").exists()) {
                     var ikonwTarget = text("知道了").findOne().bounds()
@@ -711,6 +716,7 @@ function watering(group_name, waterNum) {
             //sleep(200)
             if (WaterPoint) {
                 click(WaterPoint.centerX, WaterPoint.centerY)
+                sleep(500)
             }
             while (true) {
                 if (text("我知道了").exists() && text("继续浇水").exists()) {
@@ -751,11 +757,12 @@ function watering(group_name, waterNum) {
                                     var Etext2 = gtext.findOne(className("android.widget.EditText")).text()
                                     logUtils.infoLog('本次浇水：' + Etext2 + 'g');
                                     floaty_show_text('本次浇水：' + Etext2 + 'g')
+                                    complete = true
                                     watercount += parseInt(Etext2);
                                     click(waterTarget.centerX(), waterTarget.centerY())
+                                    sleep(200)
                                     AntForestDao.saveFriendCollect(group_name, cooperate_energy, My_energy, parseInt(Etext2))
                                     closePage()
-                                    complete = true
                                     break
                                 }
                             }
@@ -775,18 +782,22 @@ function watering(group_name, waterNum) {
                                 var Etext2 = gtext.findOne(className("android.widget.EditText")).text()
                                 logUtils.infoLog('本次浇水：' + Etext2 + 'g');
                                 floaty_show_text('本次浇水：' + Etext2 + 'g')
+                                complete = true
                                 watercount += parseInt(Etext2);
                                 click(waterTarget.centerX(), waterTarget.centerY())
+                                sleep(200)
                                 AntForestDao.saveFriendCollect(group_name, cooperate_energy, My_energy, parseInt(Etext2))
                                 closePage()
-                                complete = true
                                 break
                             }
                         }
                     }
                 } else {
                     WaterPoint = checkAndClickWater()
-                    if (WaterPoint) { click(WaterPoint.centerX, WaterPoint.centerY) }
+                    if (WaterPoint) {
+                         click(WaterPoint.centerX, WaterPoint.centerY) 
+                         sleep(500)
+                        }
                 }
                 if (className("android.view.View").text("知道了").exists()) {
                     var ikonwTarget = text("知道了").findOne().bounds()
@@ -853,6 +864,7 @@ function continue_watering(group_name, waterNum) {
             //sleep(200)
             if (WaterPoint) {
                 click(WaterPoint.centerX, WaterPoint.centerY)
+                sleep(500)
             }
             while (true) {
                 if (text("我知道了").exists() && text("继续浇水").exists()) {
@@ -893,11 +905,12 @@ function continue_watering(group_name, waterNum) {
                                     var Etext2 = gtext.findOne(className("android.widget.EditText")).text()
                                     logUtils.infoLog('本次浇水：' + Etext2 + 'g');
                                     floaty_show_text('本次浇水：' + Etext2 + 'g')
+                                    complete = true
                                     watercount += parseInt(Etext2);
                                     click(waterTarget.centerX(), waterTarget.centerY())
+                                    sleep(200)
                                     AntForestDao.saveFriendCollect(group_name, cooperate_energy, My_energy, parseInt(Etext2))
                                     closePage()
-                                    complete = true
                                     break
                                 }
                             }
@@ -916,18 +929,22 @@ function continue_watering(group_name, waterNum) {
                                 var Etext2 = gtext.findOne(className("android.widget.EditText")).text()
                                 logUtils.infoLog('本次浇水：' + Etext2 + 'g');
                                 floaty_show_text('本次浇水：' + Etext2 + 'g')
+                                complete = true
                                 watercount += parseInt(Etext2);
                                 click(waterTarget.centerX(), waterTarget.centerY())
+                                sleep(200)
                                 AntForestDao.saveFriendCollect(group_name, cooperate_energy, My_energy, parseInt(Etext2))
                                 closePage()
-                                complete = true
                                 break
                             }
                         }
                     }
                 } else {
                     WaterPoint = checkAndClickWater()
-                    if (WaterPoint) { click(WaterPoint.centerX, WaterPoint.centerY) }
+                    if (WaterPoint) { 
+                        click(WaterPoint.centerX, WaterPoint.centerY)
+                        sleep(500) 
+                    }
                 }
                 if (className("android.view.View").text("知道了").exists()) {
                     var ikonwTarget = text("知道了").findOne().bounds()
@@ -1357,6 +1374,7 @@ function bandage_Alipay() {
                     //sleep(200)
                     if (WaterPoint) {
                         click(WaterPoint.centerX, WaterPoint.centerY)
+                        sleep(500)
                     }
                     sleep(1000)
                 }

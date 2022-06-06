@@ -394,6 +394,7 @@ const ChangeConfig = {
         </template>
         </van-cell>
         <van-notice-bar v-if="configs.water_pattern==2" wrapable :scrollable="false" text="没有勾选换绑小号优先浇水，会将小号和大号的群组列表合并后用大号浇水！"/>
+        <van-cell v-if="configs.water_pattern==2" title="钉钉群组列表配置" is-link @click="routerTo('/basic/Ddwater/mineGroupList')" />
         <van-cell v-if="configs.water_pattern==2" title="小号换绑浇水列表配置" is-link @click="routerTo('/basic/Ddwater/Groups')" />
         <van-cell v-if="configs.water_pattern==2" title="大号浇水群组列表配置" is-link @click="routerTo('/basic/Ddwater/Groups_Ex')" />
         <tip-block v-if="configs.water_pattern==1">群名关键词，多个关键词请用|隔开</tip-block>
@@ -437,6 +438,84 @@ const ChangeConfig = {
         <van-field v-if="configs.pushplus" v-model="configs.pushplus_token" label="Push+ Token" label-width="7em" type="text" placeholder="请输入Push+ 的token" input-align="right" />
       </van-cell-group>
   </div>`
+}
+
+const DDmineGroupListConfig = {
+  mixins: [mixin_common],
+  data() {
+    return {
+      showAddGroupDialog: false,
+      newGroup: '',
+      newWateringDate: '',
+      configs: {
+          DDmineGroupList: [],
+      }
+    }
+  },
+  methods: {
+    addGroup: function () {
+      this.newGroup = ''
+      this.newWateringDate = '2122-01-01'
+      this.showAddGroupDialog = true
+    },
+    addGroupToDdWateringGroups: function (idx) {
+      let target = this.configs.DDmineGroupList[idx]
+      $nativeApi.request('addGroupToDdWateringGroups', target)
+    },
+    addGroupToDdWateringGroupsEx: function (idx) {
+      let target = this.configs.DDmineGroupList[idx]
+      $nativeApi.request('addGroupToDdWateringGroupsEx', target)
+    },
+    doAddGroup: function () {
+      if (this.isNotEmpty(this.newGroup) && this.configs.DDmineGroupList.map(v => v.GroupName).indexOf(this.newGroup) < 0) {
+          this.configs.DDmineGroupList.push({ GroupName: this.newGroup, WateringDate: '2122-01-01' })
+      }
+    },
+    deleteGroup: function (idx) {
+      this.$dialog.confirm({
+        message: '确认要删除' + this.configs.DDmineGroupList[idx].GroupName + '吗？'
+      }).then(() => {
+        this.configs.DDmineGroupList.splice(idx, 1)
+      }).catch(() => { })
+    },
+    scanGroupList: function () {
+      $nativeApi.request('scanGroupList').then(resp => {
+          this.configs.DDmineGroupList = resp
+        })
+    },
+  },
+  template: `
+  <div>
+    <van-divider content-position="left">
+      钉钉群组列表设置
+      <van-button style="margin-left: 0.4rem" plain hairline type="primary" size="mini" @click="addGroup">增加</van-button>
+    </van-divider>
+    <tip-block>扫描群组列表请点击<van-button style="margin-left: 0.4rem" plain hairline type="primary" size="mini" @click="scanGroupList">提取群组列表</van-button></tip-block>
+    <tip-block>配置进行操作的群组名称</tip-block>
+    <van-cell-group>
+      <div style="overflow:scroll;padding:1rem;background:#f1f1f1;">
+      <van-swipe-cell v-for="(GroupInfo,idx) in configs.DDmineGroupList" :key="GroupInfo.GroupName" stop-propagation>
+        <van-cell>
+        <template #title>
+        <van-icon name="friends-o" color="#1989fa" />
+        <span style="font-size: 10px;">合种群名：{{GroupInfo.GroupName}}</span>
+      </template>
+      </van-cell>
+        <template #right>
+          <div style="display: flex;height: 100%;">
+            <van-button square type="primary" text="加入小号列表" @click="addGroupToDdWateringGroups(idx)" style="height: 100%" size="mini" />
+            <van-button square type="info" text="加入大号列表" @click="addGroupToDdWateringGroupsEx(idx)" style="height: 100%" size="mini"/>
+            <van-button square type="danger" text="删除" @click="deleteGroup(idx)" style="height: 100%" size="small"/>
+          </div>
+        </template>
+      </van-swipe-cell>
+      </div>
+    </van-cell-group>
+    <van-dialog v-model="showAddGroupDialog" title="增加群组" show-cancel-button @confirm="doAddGroup" :get-container="getContainer">
+      <van-field v-model="newGroup" required placeholder="请输入群组名称" label="群组名称" />
+    </van-dialog>
+  </div>
+  `
 }
 
 /**
@@ -1251,7 +1330,7 @@ const SkipPackageConfig = {
 }
 
 /**
- * 日榜查催设置
+ * 总榜查催设置
  */
 
  const SumChartsCheckConfig = {

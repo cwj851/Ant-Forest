@@ -25,6 +25,7 @@ let default_config = {
   watering_friend_times: '3',
   changeBack:true,
   //钉钉浇水设置参数
+  DDmineGroupList:[],
   DdGroups_list:[],
   DdGroups_list_Ex:[],
   DdWateringGroups:[],
