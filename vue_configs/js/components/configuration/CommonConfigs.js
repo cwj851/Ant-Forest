@@ -440,6 +440,47 @@ const ChangeConfig = {
   </div>`
 }
 
+/**
+ * 钉钉加群浇水配置
+ */
+ const DdAddGroupWaterConfig = {
+  mixins: [mixin_common],
+  data() {
+    return {
+      configs: {
+        firstGroupUrl: '',
+        addGroupNum: 1,
+        AddGroupIsWatering: true,
+        AddGroupWaterNum: 500,
+        AddGroupWaterMode: "2",
+        AddGroupNoInterruptions: true,
+        AddGroupMaxContinue: false,
+      },
+    }
+  },
+  template: `
+ <div>
+      <van-cell-group>
+        <van-field v-model="configs.firstGroupUrl" label="起始群链接" label-width="7em" type="text" placeholder="请输入起始群链接" input-align="right" />
+        <number-field v-model="configs.addGroupNum" label="加群数量" label-width="8em" placeholder="请输入加群数量"/>
+        <switch-cell title="是否浇水" v-model="configs.AddGroupIsWatering" />
+        <van-cell center title="浇水水量设置" v-if="configs.AddGroupIsWatering">
+        <template #right-icon>
+        <van-radio-group v-model="configs.AddGroupWaterMode" direction="horizontal" icon-size="18px">
+        <van-radio name="1">默认</van-radio>
+        <van-radio name="2">最高</van-radio>
+        <van-radio name="3">指定</van-radio>
+        </van-radio-group>
+        </template>
+        </van-cell>
+        <number-field v-if="configs.AddGroupIsWatering && configs.AddGroupWaterMode==3" v-model="configs.AddGroupWaterNum" label="浇水数量" label-width="8em" placeholder="请输入浇水数量">
+        <template #right-icon><span>g</span></template>
+        </number-field>
+        <switch-cell title="超200人是否继续浇水" v-if="configs.AddGroupIsWatering" v-model="configs.AddGroupMaxContinue"/>
+        <switch-cell title="是否开始群消息免打扰" v-model="configs.AddGroupNoInterruptions" />
+      </van-cell-group>
+  </div>`
+}
 const DDmineGroupListConfig = {
   mixins: [mixin_common],
   data() {

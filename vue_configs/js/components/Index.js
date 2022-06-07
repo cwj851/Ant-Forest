@@ -28,6 +28,10 @@ let Index = {
           link: '/basic/Ddwater'
         },
         {
+          title: '钉钉加群浇水设置',
+          link: '/basic/DdAddGroup'
+        },
+        {
           title: 'VIP功能',
           link: '/advance/VIP'
         },

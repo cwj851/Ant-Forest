@@ -47,6 +47,14 @@ let default_config = {
   intent_or_click:'b',
   InviteWateringGroupList:[],
   InviteWateringGroupListSum:[],
+  //钉钉加群浇水设置参数
+  firstGroupUrl:'',
+  addGroupNum:1,
+  AddGroupWaterNum:500,
+  AddGroupWaterMode:'2',
+  AddGroupMaxContinue:false,
+  AddGroupIsWatering:true,
+  AddGroupNoInterruptions:true,
   //步数修改设置
   step_min: 18000,
   step_max: 21000,

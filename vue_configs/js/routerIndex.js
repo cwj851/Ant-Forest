@@ -19,6 +19,7 @@ const router = new VueRouter({
     { path: '/advance/VIP/DailyChartsCheck', component: DailyChartsCheckConfig, meta: { index: 2, title: '日榜查催群组列表设置' } },
     { path: '/advance/VIP/SumChartsCheck', component: SumChartsCheckConfig, meta: { index: 2, title: '总榜查催群组列表设置' } },
     { path: '/basic/Ddwater', component: DdwaterConfig, meta: { index: 1, title: '钉钉设置' } },
+    { path: '/basic/DdAddGroup', component: DdAddGroupWaterConfig, meta: { index: 1, title: '钉钉加群浇水设置' } },
     { path: '/basic/Ddwater/mineGroupList', component: DDmineGroupListConfig, meta: { index: 2, title: '钉钉群组列表配置' } },
     { path: '/basic/Ddwater/Groups', component: GroupsConfig, meta: { index: 2, title: '小号换绑浇水列表设置' } },
     { path: '/basic/Ddwater/Groups_Ex', component: GroupsConfig_Ex, meta: { index: 2, title: '大号浇水群组列表设置' } },
