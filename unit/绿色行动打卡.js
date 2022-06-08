@@ -65,13 +65,14 @@ function enterGreenAction() {
                 console.error("奖励按钮可能失效了，重新进入蚂蚁森林主页")
                 closePage()
                 Ant_forest()
-                return false
+                sleep(2000)
             }
         } else {
             if (countT > 5) {
                 console.warn("当前不在蚂蚁森林个人主页，正在进入蚂蚁森林主页")
                 closePage()
                 Ant_forest()
+                sleep(2000)
                 countT = 0
             }
             countT++
