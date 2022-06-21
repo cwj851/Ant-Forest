@@ -2,6 +2,9 @@ var { default_config, config, storage_name: _storage_name } = require('../config
 let singletonRequire = require('../lib/SingletonRequirer.js')(runtime, global)
 let AntForestDao = singletonRequire('AntForestDao')
 
+let waterGroupcount=0
+let watercount=0
+
 let addGroupNum=parseInt(config.addGroupNum)
 let firstGroupUrl=config.firstGroupUrl
 var wateringNum;
@@ -13,7 +16,7 @@ function enterGroupByUrl(GroupByUrl) {
 
 }
 
-function start_app() {
+/* function start_app() {
     log("正在启动app...");
     if (!(launchApp("钉钉") || launch('com.alibaba.android.rimet'))) //
     {
@@ -25,8 +28,27 @@ function start_app() {
     while (!packageName('com.alibaba.android.rimet').exists()) {}
     log("启动app成功！");
     sleep(1000);
-}
+} */
 
+function start_app() {
+    log("正在启动app...");
+    if (!(launchApp("钉钉") || launch('com.alibaba.android.rimet'))) //
+    {
+        log("找不到钉钉App!，请自己尝试打开");
+        // return;
+    }
+    sleep(2000)
+    while (!packageName('com.alibaba.android.rimet').text("消息").exists()) {
+        log("正在等待加载出主页，如果一直加载此信息，请手动返回主页，或者无障碍服务可能出现BUG，请停止运行App重新给无障碍服务");
+        closeUpdata()
+        clickBack()
+        closePage()
+        if (className("android.widget.TextView").text("钉钉小程序").exists()) { back() }
+        sleep(2000);
+    }
+    log("启动app成功！");
+    sleep(1000);
+}
 
 
 function watering_Ex(group_name, waterNum) {
@@ -277,8 +299,10 @@ if(addGroupNum<1){
             open_No_interruptions()           
             BacktoGroupTalkingPage()
         }
-        var newGroupName=enterToNextGroup(GroupName)
-        GroupName=newGroupName
+        if(i < (addGroupNum-1)){
+            var newGroupName=enterToNextGroup(GroupName)
+            GroupName=newGroupName
+        }
     }
     console.log('====================')
     console.error('运行结束，本次共加群'+addGroupNum+'个')
