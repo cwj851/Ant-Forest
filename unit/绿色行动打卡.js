@@ -81,6 +81,36 @@ function enterGreenAction() {
     }
 }
 
+function enterGreenAction2() {
+    while(!packageName('com.eg.android.AlipayGphone').text('绿色行动打卡').exists()){
+        if (packageName('com.eg.android.AlipayGphone').text("首页").selected(false).exists()) {
+            var alihome = packageName('com.eg.android.AlipayGphone').text("首页").findOne(1000)
+            if (alihome) {
+                alihome.parent().click()
+            }
+        }
+        if(idContains("home_title_search_button").exists()){
+            idContains("home_title_search_button").click()
+            sleep(500)
+        }       
+        if(idContains("search_input_box").exists()){
+            if(idContains("search_input_box").text('绿色行动').exists()){
+                if(desc('搜索').idContains("search_confirm").exists() ){
+                    desc('搜索').idContains("search_confirm").click()
+                    sleep(500)
+                }
+            }else{
+                idContains("search_input_box").setText('绿色行动')
+            }
+        }
+        sleep(500)
+    }
+    
+    if(packageName('com.eg.android.AlipayGphone').text('绿色行动打卡').exists()){
+        text('绿色行动打卡').findOne().parent().parent().click()
+    }
+}
+
 function checkAndClickReward() {
     // 直接通过偏移量获取送奖励按钮
     let target = null
@@ -99,6 +129,22 @@ function checkAndClickReward() {
 
     return target
 }
+function start_app() {
+    console.verbose("正在启动app...");
+    if (!(launchApp("支付宝") || launch('com.eg.android.AlipayGphone'))) //启动支付宝
+    {
+        console.error("找不到支付宝App!，请自己尝试打开");
+    }
+    sleep(2000)
+    while (!packageName('com.eg.android.AlipayGphone').text("首页").exists()) {
+        console.log("正在等待加载出主页，如果一直加载此信息，请手动返回主页，或者无障碍服务可能出现BUG，请停止运行App重新给无障碍服务");
+        closePage()
+        closeUpdata()
+        sleep(2000);
+    }
+    console.info("启动app成功！");
+    sleep(100);
+}
 
 function closePage() {
     if (className("android.widget.FrameLayout").desc("关闭").exists()) {
@@ -111,9 +157,15 @@ function closePage() {
         try { idContains("back_button").desc("返回").findOne(1000).click() } catch (e) { }
     }
 }
+function closeUpdata() {
+    if (textContains("稍后再说").exists() && textContains("立即更新").exists()) {
+        text("稍后再说").click();
+    }
+}
 
 function main(){
-    enterGreenAction()
+    start_app()
+    enterGreenAction2()
     startTimestamp = new Date().getTime()
     getToastAsync('com.eg.android.AlipayGphone')
     while (!toastDone) {

@@ -340,7 +340,7 @@ function watering_by_grouplists() {
                         }
                     }
                 } else {
-                    watering_Ex(Group_list[j], wateringNum)
+                    watering_Ex(config.DdGroups_list[j], wateringNum)
                 }
             }
             if (config.No_interruptions) { open_No_interruptions() }
@@ -658,8 +658,6 @@ function watering_Ex(group_name, waterNum) {
                     logUtils.errorInfo('已浇过水，执行跳过...');
                     floaty_show_text('已浇过水，执行跳过...')
                     click(ikonwTarget.centerX(), ikonwTarget.centerY())
-                    //AntForestDao.saveFriendCollect(group_name, cooperate_energy, (a-500)+'g', 500)
-                    //a-=500
                     closePage()
                     complete = true
                     break
