@@ -23,6 +23,7 @@ const router = new VueRouter({
     { path: '/basic/Ddwater/mineGroupList', component: DDmineGroupListConfig, meta: { index: 2, title: '钉钉群组列表配置' } },
     { path: '/basic/Ddwater/Groups', component: GroupsConfig, meta: { index: 2, title: '小号换绑浇水列表设置' } },
     { path: '/basic/Ddwater/Groups_Ex', component: GroupsConfig_Ex, meta: { index: 2, title: '大号浇水群组列表设置' } },
+    { path: '/basic/Ddwater/CheckTheCertificateGroups', component: CheckTheCertificateGroupsConfig, meta: { index: 2, title: '查证群组列表设置' } },
     { path: '/basic/study', component: StudyConfig, meta: { index: 1, title: 'Study设置' } },
     { path: '/basic/log', component: LogConfig, meta: { index: 1, title: '日志设置' } },
     { path: '/advance/skipPackage', component: SkipPackageConfig, meta: { index: 1, title: '前台应用白名单设置' } },

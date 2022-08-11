@@ -30,6 +30,7 @@ let default_config = {
   DdGroups_list_Ex:[],
   DdWateringGroups:[],
   DdWateringGroupsEx:[],
+  CheckTheCertificateGroups:[],
   water_pattern:'2',
   water_keywords: '',                
   skip_keywords: '', 
@@ -408,6 +409,13 @@ config.overwrite = (key, value) => {
   storages.create(storage_name).put(key, value)
 }
 
+// 扩展配置
+let workpath = getCurrentWorkPath()
+let configDataPath = workpath + '/config_data/'
+let default_image_config = {};
+['reward_for_plant', 'backpack_icon', 'sign_reward_icon','JoinGroupEnsure','exitGroupIcon'].forEach(key => default_image_config[key] = files.read(configDataPath + key + '.data'))
+default_config.image_config = default_image_config
+config.image_config = convertDefaultData(default_image_config, CONFIG_STORAGE_NAME + '_image')
 
 resetConfigsIfNeeded()
 if (!isRunningMode) {

@@ -30,7 +30,13 @@ function Read_group_lists() {
                 });
                 break
             } else {
-                MyGroups.click()
+                try {
+                    if (MyGroups.click()) {
+
+                    } else {
+                        MyGroups.parent().click()
+                    }
+                } catch (e) { }
             }
         }
         sleep(500)
@@ -47,6 +53,55 @@ function Read_group_lists_by_scroll() {
             sleep(100)
         }
         sleep(200)
+    }
+}
+
+function Read_Mygroup_lists_by_scroll() {
+    while (!idContains("tv_text").className("android.widget.TextView").text("我加入的").exists()) { }
+    if (idContains("group_list").find().length > 1) {
+        var is_theEnd = false
+        while (!is_theEnd) {
+            Read_Mygroup_lists()
+            if (idContains("group_list").exists()) {
+                var scrollL = idContains("group_list").find()[0]
+                is_theEnd = !scrollL.scrollDown()
+                sleep(100)
+            }
+            sleep(200)
+        }
+    }
+}
+
+function Read_Mygroup_lists() {
+    while (true) {
+        if (idContains("tv_text").className("android.widget.TextView").text("我创建的").exists()) {
+            var MyBuildGroups = idContains("tv_text").className("android.widget.TextView").text("我创建的").findOne().parent().parent().parent()
+            if (MyBuildGroups.selected()) {
+                //log("当前页面(我加入的)");
+                log("检测中...请勿操作手机");
+                idContains("group_list").find()[0].children().forEach(child => {
+                    var target = child.findOne(id("group_title"));
+                    if (target) {
+                        if (target.text() != "") {
+                            if (group_lists.map(v => v.GroupName).indexOf(target.text()) < 0) {
+                                group_lists.push({ GroupName: target.text(), WateringDate: '2122-01-01' })
+                                console.verbose(target.text())
+                            }
+                        }
+                    }
+                });
+                break
+            } else {
+                try {
+                    if (MyBuildGroups.click()) {
+
+                    } else {
+                        MyBuildGroups.parent().click()
+                    }
+                } catch (e) { }
+            }
+        }
+        sleep(500)
     }
 }
 function start_app() {
@@ -112,7 +167,18 @@ if (config.intent_or_click == 'a') {
 } else if (config.intent_or_click == 'b') {
     mine_group()
 }
-Read_group_lists_by_scroll()
+
+while (!idContains("tv_text").className("android.widget.TextView").text("我加入的").exists()) { }
+var group_listlength = idContains("group_list").find().length
+if (group_listlength == 1) {
+    sleep(1000)
+    Read_group_lists_by_scroll()
+} else if (group_listlength == 2) {
+    sleep(1000)
+    Read_Mygroup_lists_by_scroll()
+    sleep(1000)
+    Read_group_lists_by_scroll()
+}
 console.log('====================')
 console.warn('提取完毕！共提取' + group_lists.length + '个')
 if (group_lists.length > 0) {

@@ -49,7 +49,11 @@ function start_app() {
     log("启动app成功！");
     sleep(1000);
 }
-
+function closeUpdata() {
+    if (text("暂不更新").exists() && text("更新").exists()) {
+        text("暂不更新").click();
+    }
+}
 
 function watering_Ex(group_name, waterNum) {
     var complete = false
@@ -227,26 +231,31 @@ function open_No_interruptions() {
         sleep(500)
     }
 }
-function enterToNextGroup(group_name){
-    while(idContains("tv_title").textContains(group_name).exists()) {
+function enterToNextGroup(group_name) {
+    while (idContains("tv_title").textContains(group_name).exists()) {
         if (idContains("new_top_menu").exists()) {
-            var card_view = idContains("card_view_container").findOne()
-            var groupURl = card_view.findOne(text('链接'))
-            if (groupURl) {
-                groupURl.parent().child(4).click()
-                sleep(200)
+            var card_view = idContains("card_view_container").find()
+            if (card_view) {
+                for (var i = 1; i < card_view.length; i++) {
+                    var groupURl = card_view[i].findOne(text('链接'))
+                    if (groupURl) {
+                        groupURl.parent().child(4).click()
+                        sleep(200)
+                        break
+                    }
+                }
             }
         }
         sleep(500)
-    }   
-    while (!idContains("rl_title_container").exists()) { 
-        if(idContains("btn_add_to_group").exists()){
+    }
+    while (!idContains("rl_title_container").exists()) {
+        if (idContains("btn_add_to_group").exists()) {
             idContains("btn_add_to_group").click()
             sleep(200)
         }
-    sleep(500)
+        sleep(500)
     }
-   return idContains("tv_title").findOne().text()
+    return idContains("tv_title").findOne().text()
 }
 
 function clickBack() {
@@ -286,7 +295,12 @@ if(addGroupNum<1){
     }
     start_app()
     enterGroupByUrl(firstGroupUrl)
-    while (!className("android.widget.ImageView").desc("群聊信息").exists()) {}
+    while (!className("android.widget.ImageView").desc("群聊信息").exists()) {
+        if(idContains("btn_add_to_group").exists()){
+            idContains("btn_add_to_group").click()
+            sleep(200)
+        }
+    }
     var GroupName=idContains("tv_title").findOne().text()
     for (var  i= 0; i < addGroupNum; i++) {
         console.log('====================')

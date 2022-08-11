@@ -397,6 +397,7 @@ const ChangeConfig = {
         <van-cell v-if="configs.water_pattern==2" title="钉钉群组列表配置" is-link @click="routerTo('/basic/Ddwater/mineGroupList')" />
         <van-cell v-if="configs.water_pattern==2" title="小号换绑浇水列表配置" is-link @click="routerTo('/basic/Ddwater/Groups')" />
         <van-cell v-if="configs.water_pattern==2" title="大号浇水群组列表配置" is-link @click="routerTo('/basic/Ddwater/Groups_Ex')" />
+        <van-cell title="查证群组列表配置" is-link @click="routerTo('/basic/Ddwater/CheckTheCertificateGroups')" />
         <tip-block v-if="configs.water_pattern==1">群名关键词，多个关键词请用|隔开</tip-block>
         <van-field v-if="configs.water_pattern==1" v-model="configs.water_keywords" label="群名关键词" label-width="10em" type="text" placeholder="请输入群名关键词" input-align="right" />
         <tip-block v-if="configs.water_pattern==1">跳过群名关键词，多个关键词请用|隔开</tip-block>
@@ -481,6 +482,7 @@ const ChangeConfig = {
       </van-cell-group>
   </div>`
 }
+
 const DDmineGroupListConfig = {
   mixins: [mixin_common],
   data() {
@@ -507,6 +509,10 @@ const DDmineGroupListConfig = {
       let target = this.configs.DDmineGroupList[idx]
       $nativeApi.request('addGroupToDdWateringGroupsEx', target)
     },
+    addGroupToCheckTheCertificateGroups: function (idx) {
+      let target = this.configs.DDmineGroupList[idx]
+      $nativeApi.request('addGroupToCheckTheCertificateGroups', target)
+    },
     doAddGroup: function () {
       if (this.isNotEmpty(this.newGroup) && this.configs.DDmineGroupList.map(v => v.GroupName).indexOf(this.newGroup) < 0) {
           this.configs.DDmineGroupList.push({ GroupName: this.newGroup, WateringDate: '2122-01-01' })
@@ -532,7 +538,16 @@ const DDmineGroupListConfig = {
       <van-button style="margin-left: 0.4rem" plain hairline type="primary" size="mini" @click="addGroup">增加</van-button>
     </van-divider>
     <tip-block>扫描群组列表请点击<van-button style="margin-left: 0.4rem" plain hairline type="primary" size="mini" @click="scanGroupList">提取群组列表</van-button></tip-block>
-    <tip-block>配置进行操作的群组名称</tip-block>
+    <van-cell >
+    <template #title>
+      <span style="font-size: 10px;">配置进行操作的群组名称</span>
+    </template>
+    <template #default>
+      <van-icon name="logistics" color="#ff9933" />
+      <span style="font-size: 10px; ">群数量:</span>
+      <van-tag plain type="primary">{{configs.DDmineGroupList.length}}</van-tag>
+    </template>
+  </van-cell>
     <van-cell-group>
       <div style="overflow:scroll;padding:1rem;background:#f1f1f1;">
       <van-swipe-cell v-for="(GroupInfo,idx) in configs.DDmineGroupList" :key="GroupInfo.GroupName" stop-propagation>
@@ -544,9 +559,10 @@ const DDmineGroupListConfig = {
       </van-cell>
         <template #right>
           <div style="display: flex;height: 100%;">
+            <van-button color="#7232dd" text="加入查证列表" @click="addGroupToCheckTheCertificateGroups(idx)" style="height: 100%" size="mini" />
             <van-button square type="primary" text="加入小号列表" @click="addGroupToDdWateringGroups(idx)" style="height: 100%" size="mini" />
             <van-button square type="info" text="加入大号列表" @click="addGroupToDdWateringGroupsEx(idx)" style="height: 100%" size="mini"/>
-            <van-button square type="danger" text="删除" @click="deleteGroup(idx)" style="height: 100%" size="small"/>
+            <van-button square type="danger" text="删除" @click="deleteGroup(idx)" style="height: 100%" size="mini"/>
           </div>
         </template>
       </van-swipe-cell>
@@ -573,7 +589,8 @@ const GroupsConfig = {
       editIdx: '',
       configs: {
         DdWateringGroups: [{ GroupName: 'aD234往事永动轮种的去的', WateringDate: '2022-06-10' }],
-      }
+      },
+      GroupNum:0,
     }
   },
   methods: {
@@ -647,7 +664,16 @@ const GroupsConfig = {
       小号换绑浇水列表设置
       <van-button style="margin-left: 0.4rem" plain hairline type="primary" size="mini" @click="addGroup">增加</van-button>
     </van-divider>
-    <tip-block>配置进行操作的群组名称</tip-block>
+    <van-cell >
+     <template #title>
+       <span style="font-size: 10px;">配置进行操作的群组名称</span>
+     </template>
+     <template #default>
+      <van-icon name="logistics" color="#ff9933" />
+      <span style="font-size: 10px; ">群数量:</span>
+      <van-tag plain type="primary">{{configs.DdWateringGroups.length}}</van-tag>
+     </template>
+    </van-cell>
     <van-cell-group>
       <div style="overflow:scroll;padding:1rem;background:#f1f1f1;">
       <van-swipe-cell v-for="(GroupInfo,idx) in configs.DdWateringGroups" :key="GroupInfo.GroupName" stop-propagation>
@@ -768,7 +794,16 @@ const GroupsConfig_Ex = {
       大号浇水群组列表设置
       <van-button style="margin-left: 0.4rem" plain hairline type="primary" size="mini" @click="addGroup">增加</van-button>
     </van-divider>
-    <tip-block>配置进行操作的群组名称</tip-block>
+    <van-cell >
+      <template #title>
+        <span style="font-size: 10px;">配置进行操作的群组名称</span>
+      </template>
+      <template #default>
+        <van-icon name="logistics" color="#ff9933" />
+        <span style="font-size: 10px; ">群数量:</span>
+        <van-tag plain type="primary">{{configs.DdWateringGroupsEx.length}}</van-tag>
+      </template>
+    </van-cell>
     <van-cell-group>
       <div style="overflow:scroll;padding:1rem;background:#f1f1f1;">
       <van-swipe-cell v-for="(GroupInfo,idx) in configs.DdWateringGroupsEx" :key="GroupInfo.GroupName" stop-propagation>
@@ -799,6 +834,137 @@ const GroupsConfig_Ex = {
   </div>
   `
 }
+
+/**
+ * 查询证书群组列表设置
+ */
+
+ const CheckTheCertificateGroupsConfig = {
+  mixins: [mixin_common],
+  data() {
+    return {
+      showAddGroupExDialog: false,
+      isEdit: false,
+      newGroupEx: '',
+      newWateringDateEx: '',
+      editIdx: '',
+      configs: {
+        CheckTheCertificateGroups: [{ GroupName: 'a', WateringDate: '2022-01-01' }],
+      }
+    }
+  },
+  methods: {
+    addGroup: function () {
+      this.newGroupEx = ''
+      this.newWateringDateEx = ''
+      this.showAddGroupExDialog = true
+      this.isEdit = false
+    },
+    editGroup: function (idx) {
+      let target = this.configs.CheckTheCertificateGroups[idx]
+      this.editIdx = idx
+      this.isEdit = true
+      this.newGroupEx = target.GroupName
+      this.newWateringDateEx = target.WateringDate
+      this.showAddGroupExDialog = true
+    },
+    confirmAction: function () {
+      if (this.isEdit) {
+        this.doEditGroup()
+      } else {
+        this.doAddGroup()
+      }
+    },
+    doAddGroup: function () {
+      if (this.isNotEmpty(this.newGroupEx) && this.configs.CheckTheCertificateGroups.map(v => v.GroupName).indexOf(this.newGroupEx) < 0) {
+        if (this.isNotEmpty(this.newWateringDateEx)) {
+          let DateRes = this.newWateringDateEx.match(new RegExp(/((^((1[8-9]\d{2})|([2-9]\d{3}))(-)(10|12|0[13578])(-)(3[01]|[12][0-9]|0[1-9])$)|(^((1[8-9]\d{2})|([2-9]\d{3}))(-)(11|0?[469])(-)(30|[12][0-9]|0[1-9])$)|(^((1[8-9]\d{2})|([2-9]\d{3}))(-)(02)(-)(2[0-8]|1[0-9]|0[1-9])$)|(^([2468][048]00)(-)(02)(-)(29)$)|(^([3579][26]00)(-)(02)(-)(29)$)|(^([1][89][0][48])(-)(02)(-)(29)$)|(^([2-9][0-9][0][48])(-)(02)(-)(29)$)|(^([1][89][2468][048])(-)(02)(-)(29)$)|(^([2-9][0-9][2468][048])(-)(02)(-)(29)$)|(^([1][89][13579][26])(-)(02)(-)(29)$)|(^([2-9][0-9][13579][26])(-)(02)(-)(29)$))/));
+          let DateResult = DateRes ? DateRes[0] : '';
+          if (DateResult != '') {
+            this.configs.CheckTheCertificateGroups.push({ GroupName: this.newGroupEx, WateringDate: DateResult })
+          } else {
+            vant.Toast('查证截止日期格式不正确')
+          }
+        } else {
+          this.configs.CheckTheCertificateGroups.push({ GroupName: this.newGroupEx, WateringDate: '2022-01-01' })
+        }
+      }
+    },
+    doEditGroup: function () {
+      if (this.isNotEmpty(this.newGroupEx)) {
+        let newGroupEx = this.newGroupEx
+        let editIdx = this.editIdx
+        if (this.configs.CheckTheCertificateGroups.filter((v, idx) => v.GroupName == newGroupEx && idx != editIdx).length > 0) {
+          return
+        }
+        if (this.isNotEmpty(this.newWateringDateEx)) {
+          let DateRes = this.newWateringDateEx.match(new RegExp(/((^((1[8-9]\d{2})|([2-9]\d{3}))(-)(10|12|0[13578])(-)(3[01]|[12][0-9]|0[1-9])$)|(^((1[8-9]\d{2})|([2-9]\d{3}))(-)(11|0?[469])(-)(30|[12][0-9]|0[1-9])$)|(^((1[8-9]\d{2})|([2-9]\d{3}))(-)(02)(-)(2[0-8]|1[0-9]|0[1-9])$)|(^([2468][048]00)(-)(02)(-)(29)$)|(^([3579][26]00)(-)(02)(-)(29)$)|(^([1][89][0][48])(-)(02)(-)(29)$)|(^([2-9][0-9][0][48])(-)(02)(-)(29)$)|(^([1][89][2468][048])(-)(02)(-)(29)$)|(^([2-9][0-9][2468][048])(-)(02)(-)(29)$)|(^([1][89][13579][26])(-)(02)(-)(29)$)|(^([2-9][0-9][13579][26])(-)(02)(-)(29)$))/));
+          let DateResult = DateRes ? DateRes[0] : '';
+          if (DateResult != '') {
+            this.configs.CheckTheCertificateGroups[editIdx] = { GroupName: this.newGroupEx, WateringDate: DateResult }
+          } else {
+            vant.Toast('查证截止日期格式不正确')
+          }
+        } else {
+          this.configs.CheckTheCertificateGroups[editIdx] = { GroupName: this.newGroupEx, WateringDate: '2122-01-01' }
+        }
+      }
+    },
+    deleteGroup: function (idx) {
+      this.$dialog.confirm({
+        message: '确认要删除' + this.configs.CheckTheCertificateGroups[idx].GroupName + '吗？'
+      }).then(() => {
+        this.configs.CheckTheCertificateGroups.splice(idx, 1)
+      }).catch(() => { })
+    },
+  },
+  template: `
+  <div>
+    <van-divider content-position="left">
+      查询证书群组列表设置
+      <van-button style="margin-left: 0.4rem" plain hairline type="primary" size="mini" @click="addGroup">增加</van-button>
+    </van-divider>
+    <van-cell >
+    <template #title>
+      <span style="font-size: 10px;">配置进行操作的群组名称</span>
+    </template>
+    <template #default>
+      <van-icon name="logistics" color="#ff9933"/>
+      <span style="font-size: 10px; ">群数量:</span>
+      <van-tag plain type="primary">{{configs.CheckTheCertificateGroups.length}}</van-tag>
+    </template>
+  </van-cell>
+    <van-cell-group>
+      <div style="overflow:scroll;padding:1rem;background:#f1f1f1;">
+      <van-swipe-cell v-for="(GroupInfo,idx) in configs.CheckTheCertificateGroups" :key="GroupInfo.GroupName" stop-propagation>
+        <van-cell>
+        <template #title>
+        <van-icon name="friends-o" color="#1989fa" />
+        <span style="font-size: 10px;">合种群名：{{GroupInfo.GroupName}}</span>
+      </template>
+      <template #label>
+      <van-icon name="calendar-o" color="#ee0a24" />
+      <span style="font-size: 10px;">截止日期：{{GroupInfo.WateringDate}}</span>
+    </template>
+      </van-cell>
+        <template #right>
+          <div style="display: flex;height: 100%;">
+            <van-button square type="primary" text="修改" @click="editGroup(idx)" style="height: 100%" />
+            <van-button square type="danger" text="删除" @click="deleteGroup(idx)" style="height: 100%" />
+          </div>
+        </template>
+      </van-swipe-cell>
+      </div>
+    </van-cell-group>
+    <van-dialog v-model="showAddGroupExDialog" title="增加群组" show-cancel-button @confirm="confirmAction" :get-container="getContainer">
+      <van-field v-model="newGroupEx" required placeholder="请输入群组名称" label="群组名称" />
+      <van-field v-model="newWateringDateEx" placeholder="请输入查证截止日期" label="截止日期" />
+      <tip-block>查证截止日期格式YYYY-MM-DD,例如2022-06-01,不填则默认为2022-01-01</tip-block>
+    </van-dialog>
+  </div>
+  `
+}
+
 /**
  * Study配置
  */
@@ -1216,7 +1382,16 @@ const SkipPackageConfig = {
     <switch-cell title="Push+推送步数修改结果" v-model="configs.Sportpushplus"/>
         <tip-block v-if="configs.Sportpushplus">Push+消息推送是通过关注push公众号将每日步数修改情况通过微信推送。Token获取：浏览器打开网址http://www.pushplus.plus 点击登录，微信扫码关注公众号后网页会显示一个token参数</tip-block>
         <van-field v-if="configs.Sportpushplus" v-model="configs.pushplus_token" label="Push+ Token" label-width="7em" type="text" placeholder="请输入Push+ 的token" input-align="right" />
-    <tip-block>配置进行步数同步的小米运动账号</tip-block>
+    <van-cell >
+    <template #title>
+      <span style="font-size: 10px;">配置进行步数同步的小米运动账号</span>
+    </template>
+    <template #default>
+      <van-icon name="logistics" color="#ff9933" />
+      <span style="font-size: 10px; ">账号数:</span>
+      <van-tag plain type="primary">{{configs.huami_account_lists.length}}</van-tag>
+    </template>
+  </van-cell>
       <div style="min-height:10rem;overflow:scroll;padding:1rem;background:#f1f1f1;">
         <van-swipe-cell v-for="(HM,idx) in configs.huami_account_lists" :key="HM.username" stop-propagation>
           <van-cell>
@@ -1323,7 +1498,16 @@ const SkipPackageConfig = {
       <van-button style="margin-left: 0.4rem" plain hairline type="primary" size="mini" @click="addGroup">增加</van-button>
     </van-divider>
     <switch-cell title="只查催带WS编号" v-model="configs.DailyOnly"/>
-    <tip-block>配置进行操作的群组名称</tip-block>
+    <van-cell >
+    <template #title>
+      <span style="font-size: 10px;">配置进行操作的群组名称</span>
+    </template>
+    <template #default>
+      <van-icon name="logistics" color="#ff9933" />
+      <span style="font-size: 10px; ">群数量:</span>
+      <van-tag plain type="primary">{{configs.InviteWateringGroupList.length}}</van-tag>
+    </template>
+  </van-cell>
     <van-cell-group>
       <div style="overflow:scroll;padding:1rem;background:#f1f1f1;">
       <van-swipe-cell v-for="(GroupInfo,idx) in configs.InviteWateringGroupList" :key="GroupInfo.groupName" stop-propagation>
@@ -1460,8 +1644,17 @@ const SkipPackageConfig = {
       <van-button style="margin-left: 0.4rem" plain hairline type="primary" size="mini" @click="addGroup">增加</van-button>
     </van-divider>
     <switch-cell title="只查催带WS编号" v-model="configs.SumOnly"/>
-    <tip-block>配置进行操作的群组名称</tip-block>
     <van-notice-bar left-icon="volume-o" text="查催总水量请去尾后设置成100的倍数，例如总水量为8888g时需要设置为8800！"/>
+    <van-cell >
+    <template #title>
+      <span style="font-size: 10px;">配置进行操作的群组名称</span>
+    </template>
+    <template #default>
+      <van-icon name="logistics" color="#ff9933" />
+      <span style="font-size: 10px; ">群数量:</span>
+      <van-tag plain type="primary">{{configs.InviteWateringGroupListSum.length}}</van-tag>
+    </template>
+  </van-cell>
     <van-cell-group>
       <div style="overflow:scroll;padding:1rem;background:#f1f1f1;">
       <van-swipe-cell v-for="(GroupInfo,idx) in configs.InviteWateringGroupListSum" :key="GroupInfo.groupName" stop-propagation>

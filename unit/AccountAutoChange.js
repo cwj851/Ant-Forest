@@ -602,7 +602,7 @@ function checkAndClickSend() {
         let warpBounds = jTreeWarp.bounds()
         target = {
             centerX: parseInt(warpBounds.left - 0.11 * warpBounds.width()),
-            centerY: parseInt(warpBounds.bottom - 0.07 * warpBounds.height())
+            centerY: parseInt(warpBounds.bottom - 0.28 * warpBounds.height())
         }
     }
     return target
@@ -638,7 +638,18 @@ function SendTool(friendId) {
             if (SendToolPoint) {
                 click(SendToolPoint.centerX, SendToolPoint.centerY)
             }
-            while (!text('我的道具').exists()) { }
+            let waitTime=0
+            while (!text('我的道具').exists()) { 
+                if(waitTime>4){
+                    SendToolPoint = checkAndClickSend()
+                    if (SendToolPoint) {
+                        click(SendToolPoint.centerX, SendToolPoint.centerY)
+                        waitTime=0
+                    } 
+                }
+                waitTime++
+                sleep(1000)
+            }
             //text('我的道具').waitFor()
             sleep(1000)
             while (!textContains("还没有道具").exists()) {
@@ -780,11 +791,10 @@ function checkAndClickReward() {
             let warpBounds = jTreeWarp.bounds()
             target = {
                 centerX: parseInt(warpBounds.left - 0.3 * warpBounds.width()),
-                centerY: parseInt(warpBounds.bottom - 0.07 * warpBounds.height())
+                centerY: parseInt(warpBounds.bottom - 0.28 * warpBounds.height())
             }
         }
     }
-
     return target
 }
 

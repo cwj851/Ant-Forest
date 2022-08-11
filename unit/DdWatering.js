@@ -287,11 +287,11 @@ function watering_by_grouplists_EX() {
             if (config.No_interruptions) { open_No_interruptions() }
             if (config.sticky) { open_sticky() }
             logUtils.logInfo("====================");
-            if (config.intent_or_click == 'a') {
+            //if (config.intent_or_click == 'a') {
                 back_to_group_search()
-            } else if (config.intent_or_click == 'b') {
-                mine_group()
-            }
+            //} else if (config.intent_or_click == 'b') {
+               //mine_group()
+            //}
         }
 
     }
@@ -346,11 +346,11 @@ function watering_by_grouplists() {
             if (config.No_interruptions) { open_No_interruptions() }
             if (config.sticky) { open_sticky() }
             logUtils.logInfo("====================");
-            if (config.intent_or_click == 'a') {
+            //if (config.intent_or_click == 'a') {
                 back_to_group_search()
-            } else if (config.intent_or_click == 'b') {
-                mine_group()
-            }
+            //} else if (config.intent_or_click == 'b') {
+               // mine_group()
+           // }
         }
     }
 }
@@ -434,14 +434,20 @@ function back_to_group_lists() {
 
 function back_to_group_search() {
     while (true) {
-        if (idContains("search_src_text").exists()) {
-            break
-        } else {
-            clickBack()
+      if (idContains("search_src_text").exists()) {
+        break
+      } else if (text("消息").exists() && text("通讯录").exists()) {
+        break
+      } else {
+        if (className("android.widget.ImageView").desc("群聊信息").exists() || text('总排行榜').exists() || className("android.widget.TextView").text("群设置").exists() || text("成就").exists()) {
+          clickBack()
+          sleep(500)
         }
-        sleep(1000)
+      }
+      sleep(100)
     }
-}
+  }
+
 function Read_group_lists() {
     group_lists = [];
     while (true) {
@@ -1035,44 +1041,54 @@ function open_sticky() {
 
 function search_groupsAndclick(group_name) {
     let complete = false
+    let doubleCheck = false
     while (!complete) {
-        if (textContains(group_name).exists()) {
-            if (text("未搜索到相关结果").exists()) {
-                logUtils.logInfo(group_name + '未搜索到相关结果')
-                complete = true
-            } else if (text("我的群组").exists()) {
-                sleep(200)
-                try {
-                    //var groupText = idContains("tv_friend_name").findOne(1000)
-                    var groupText = idContains("tv_friend_name").textContains(group_name).findOne(1000)
-                    if (groupText) {
-                        if (groupText.text().indexOf(group_name) != -1) {
-                            logUtils.logInfo("匹配到群：" + group_name)
-                            groupText.parent().parent().parent().parent().parent().parent().click()
-                            return true
-                        }
-                    }
-                } catch (e) { }
+      if (textContains(group_name).exists()) {
+        if (text("未搜索到相关结果").exists()) {
+          logUtils.logInfo(group_name + '未搜索到相关结果')
+          if (doubleCheck) {
+            complete = true
+          } else {
+            sleep(3000)
+          }
+          doubleCheck = true
+        } else if (text("我的群组").exists()) {
+          sleep(200)
+          try {
+            //var groupText = idContains("tv_friend_name").findOne(1000)
+            var groupText = idContains("tv_friend_name").textContains(group_name).findOne(1000)
+            if (groupText) {
+              if (groupText.text().indexOf(group_name) != -1) {
+                logUtils.logInfo("匹配到群：" + group_name)
+                groupText.parent().parent().parent().parent().parent().parent().click()
+                return true
+              }
             }
-        } else {
-            var search_groups = idContains("search_src_text").findOne(1000)
-            if (search_groups) {
-                logUtils.debugInfo("开始查找群：" + group_name)
-                search_groups.setText(group_name)
-            }
-            if (idContains("view_search").exists()) {
-                try { idContains("view_search").findOne(1000).click() } catch (e) { }
-            }
+          } catch (e) { }
         }
-        if (!idContains("search_src_text").exists() && text("我加入的").exists()) {
-            if (idContains("view_search").exists()) {
-                try { idContains("view_search").findOne(1000).click() } catch (e) { }
-            }
+      } else {
+        var search_groups = idContains("search_src_text").findOne(1000)
+        if (search_groups) {
+          logUtils.debugInfo("开始查找群：" + group_name)
+          search_groups.setText(group_name)
         }
-        sleep(500)
+        if (idContains("view_search").exists()) {
+          try { idContains("view_search").findOne(1000).click() } catch (e) { }
+        }
+      }
+      if (!idContains("search_src_text").exists() && text("我加入的").exists()) {
+        if (idContains("view_search").exists()) {
+          try { idContains("view_search").findOne(1000).click() } catch (e) { }
+        }
+      }
+      if (text("消息").exists()&&text("通讯录").exists()) {
+        mine_group()
+        sleep(1000)
+      }
+      sleep(500)
     }
     return false
-}
+  }
 
 function push_watering_today() {
     logUtils.warnInfo('正在进行push+消息推送');
@@ -1294,11 +1310,23 @@ function checkAndClickManger() {
     // 直接通过偏移量获取管理按钮
     let plantTrees = className("android.view.View").text("种树").findOne(1000)
     let target = null
-    if (plantTrees) {
+/*     if (plantTrees) {
         let warpBounds = plantTrees.bounds()
         target = {
             centerX: parseInt(warpBounds.left + 0.52 * warpBounds.width()),
             centerY: parseInt(warpBounds.top + 10.5 * warpBounds.height())
+        }
+    } */
+    if (plantTrees) {
+        let Achievement = plantTrees.parent().parent().parent().child(11)
+        if(Achievement){
+/*             let warpBounds = Achievement.bounds()
+            target = {
+              centerX: warpBounds.centerX(),
+              centerY: warpBounds.centerY()
+            } */
+            Achievement.child(0).click()
+            return true
         }
     }
     return target
@@ -1323,8 +1351,8 @@ function change_watering_account() {
                 if (text('总排行榜').exists()) {
                     var MangerPoint = checkAndClickManger()
                     //sleep(200)
-                    if (MangerPoint) { click(MangerPoint.centerX, MangerPoint.centerY) }
-                    sleep(1000)
+                    //if (MangerPoint) { click(MangerPoint.centerX, MangerPoint.centerY) }
+                    //sleep(1000)
                 }
                 sleep(500)
             }
@@ -1470,7 +1498,7 @@ function killApp(name) {
 function mine_group() {
     app.startActivity({
         action: "VIEW",
-        data: "dingtalk://dingtalkclient/page/link?url=" + encodeURIComponent("https://qr.dingtalk.com/mine_group_conversation.html#Intent;launchFlags=0x4000000;package=com.alibaba.android.rimet;component=com.alibaba.android.rimet/com.alibaba.android.dingtalkim.activities.MineGroupConversationActivity"),
+        data: "dingtalk://dingtalkclient/page/link?url=" + encodeURIComponent("https://qr.dingtalk.com/mine_group_conversation.html"),
     });
 }
 
